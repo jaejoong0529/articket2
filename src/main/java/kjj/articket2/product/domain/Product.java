@@ -1,10 +1,10 @@
 package kjj.articket2.product.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import kjj.articket2.member.domain.Member;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -15,12 +15,17 @@ import lombok.*;
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)  // 판매자 정보
+    @JoinColumn(name = "member_id")
+    private Member member;
+
     private String productName;
-    private Integer currentBid;
     private String description;
     private Integer price;
     private String image;
-    private String category;
+    private LocalDateTime createdAt;
 
 
 
