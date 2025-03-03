@@ -3,10 +3,8 @@ package kjj.articket2.product;
 import kjj.articket2.member.domain.Member;
 import kjj.articket2.product.domain.Product;
 import kjj.articket2.product.dto.ProductCreateRequest;
-import kjj.articket2.product.dto.ProductCreateResponse;
+import kjj.articket2.product.dto.ProductResponse;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 
 @Component
 public class ProductConverter {
@@ -18,15 +16,18 @@ public class ProductConverter {
                 .price(requestDto.getPrice())
                 .build();
     }
-    public static ProductCreateResponse toCreateProductResponse(Product product) {
-        return new ProductCreateResponse(
-                product.getId(),
-                product.getProductName(),
-                product.getDescription(),
-                product.getPrice(),
-                product.getCreatedAt()
-        );
+    public static ProductResponse fromEntity(Product product) {
+        return ProductResponse.builder()
+                .id(product.getId())
+                .productName(product.getProductName())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .sellerUsername(product.getMember().getUsername())
+                .createdAt(product.getCreatedAt())
+                .build();
     }
+
+
 }
 
 
