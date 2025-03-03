@@ -1,4 +1,4 @@
-package kjj.articket2.member.dto;
+package kjj.articket2.auth.dto;
 
 import lombok.Getter;
 

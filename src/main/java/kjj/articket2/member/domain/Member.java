@@ -42,6 +42,7 @@ public class Member {
         return formatted(lastLogin);
     }
 
+
     private String formatted(LocalDateTime dateTime) {//LocalDateTime 객체를 받아서 지정된 형식으로 문자열을 반환
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return dateTime.format(formatter);
