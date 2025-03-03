@@ -1,6 +1,7 @@
 package kjj.articket2.member.controller;
 
 import jakarta.servlet.http.HttpSession;
+import kjj.articket2.auth.dto.MemberSignUpRequest;
 import kjj.articket2.member.dto.*;
 import kjj.articket2.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -14,41 +15,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
-
-    @PostMapping("/signup")
-    public ResponseEntity<String> signUp(@RequestBody MemberSignUpRequest request) {
-        memberService.signup(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body("회원가입 완료");
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<MemberLoginResponse> login(@RequestBody MemberLoginRequest request, HttpSession session) {
-        MemberLoginResponse response = memberService.login(request, session);
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpSession session) {
-        memberService.logout(session);
-        return ResponseEntity.ok("로그아웃 성공");
-    }
-
     @PostMapping("/findUsername")
-    public ResponseEntity<MemberFindUsernameResponse> findUsername(@RequestBody MemberFindUsernameRequest request) {
-        MemberFindUsernameResponse response = memberService.findUsername(request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<String> findUsername(@RequestBody MemberFindUsernameRequest request) {
+        memberService.findUsername(request);
+        return ResponseEntity.ok("아이디가 이메일로 전송되었습니다.");
     }
     @PostMapping("/findPassword")
-    public ResponseEntity<MemberFindPasswordResponse> findPassword(@RequestBody MemberFindPasswordRequest request) {
-        MemberFindPasswordResponse response = memberService.findPassword(request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<String> findPassword(@RequestBody MemberFindPasswordRequest request) {
+        memberService.findPassword(request);
+        return ResponseEntity.ok("임시 비밀번호가 이메일로 전송되었습니다.");
     }
     @PostMapping("/changePassword")
-    public ResponseEntity<MemberChangePasswordResponse> changePassword(@RequestBody MemberChangePasswordRequest request) {
-        MemberChangePasswordResponse response = memberService.changePassword(request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<String> changePassword(@RequestBody MemberChangePasswordRequest request) {
+        memberService.changePassword(request);
+        return ResponseEntity.ok("비밀번호가 변경되었습니다.");
     }
 
 }
-
-

@@ -2,10 +2,13 @@ package kjj.articket2.member.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+
 @Builder
 @Getter
 public class MemberLoginResponse {
     private String message;
+    private String accessToken;
+    private String refreshToken;
 }
 
 // record 공부하기 (왜 쓰는지?)
