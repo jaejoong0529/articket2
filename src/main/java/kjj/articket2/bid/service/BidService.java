@@ -4,12 +4,11 @@ import kjj.articket2.bid.domain.Bid;
 import kjj.articket2.bid.dto.BidRequest;
 import kjj.articket2.bid.exception.InvalidBidException;
 import kjj.articket2.bid.repository.BidRepository;
-import kjj.articket2.global.jwt.JwtUtil;
+import kjj.articket2.global.jwt.CustomUserDetails;
 import kjj.articket2.member.domain.Member;
 import kjj.articket2.member.exception.MemberNotFoundException;
 import kjj.articket2.member.repository.MemberRepository;
 import kjj.articket2.product.domain.Product;
-import kjj.articket2.product.dto.ProductCreateRequest;
 import kjj.articket2.product.exception.ProductNotFoundException;
 import kjj.articket2.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,13 +24,12 @@ public class BidService {
     private final BidRepository bidRepository;
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
-    private final JwtUtil jwtUtil;
 
-    public void bidProduct(BidRequest request, String accessToken) {
-        if (accessToken == null || !jwtUtil.validateToken(accessToken)) {
+    public void bidProduct(BidRequest request, CustomUserDetails userDetails) {
+        if (userDetails == null) {
             throw new RuntimeException("허용되지 않았습니다");
         }
-        String username = jwtUtil.getUsernameFromToken(accessToken);
+        String username = userDetails.getUsername(); // 사용자 이름 가져오기
         Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException("상품을 찾을 수 없습니다."));
 

@@ -1,5 +1,6 @@
 package kjj.articket2.product.service;
 
+import kjj.articket2.global.jwt.CustomUserDetails;
 import kjj.articket2.global.jwt.JwtUtil;
 import kjj.articket2.member.domain.Member;
 import kjj.articket2.member.exception.MemberNotFoundException;
@@ -24,22 +25,21 @@ import java.util.stream.Collectors;
 @Transactional
 public class ProductService {
     private final ProductRepository productRepository;
-
-    private final JwtUtil jwtUtil;
     private final MemberRepository memberRepository;
 
-    public void createProduct(ProductCreateRequest request, String accessToken) {
-        if (accessToken == null || !jwtUtil.validateToken(accessToken)) {
+    public void createProduct(ProductCreateRequest request, CustomUserDetails userDetails) {
+        if (userDetails == null) {
             throw new RuntimeException("허용되지 않았습니다");
         }
 
-        String username = jwtUtil.getUsernameFromToken(accessToken);
+        String username = userDetails.getUsername(); // 사용자 이름 가져오기
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberNotFoundException("사용자를 찾을 수 없습니다."));
 
         Product product = ProductConverter.fromDto(request, member).toBuilder()
                 .createdAt(LocalDateTime.now())
                 .build();
+
         productRepository.save(product);
     }
 
@@ -58,40 +58,42 @@ public class ProductService {
     }
 
     // ✅ 상품 삭제 (판매자만 가능)
-    public void deleteProduct(Long id, String accessToken) {
-        if (accessToken == null || !jwtUtil.validateToken(accessToken)) {
+    public void deleteProduct(Long id, CustomUserDetails userDetails) {
+        if (userDetails == null) {
             throw new RuntimeException("허용되지 않았습니다.");
         }
 
-        String username = jwtUtil.getUsernameFromToken(accessToken);
+        String username = userDetails.getUsername();
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberNotFoundException("사용자를 찾을 수 없습니다."));
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("해당 상품을 찾을 수 없습니다."));
 
-        if (!product.getMember().getUsername().equals(username)) {
+        if (!product.getMember().equals(member)) {
             throw new RuntimeException("삭제 권한이 없습니다.");
         }
 
         productRepository.delete(product);
     }
 
-    public void updateProduct(Long id, ProductUpdateRequest request, String accessToken) {
-        if (accessToken == null || !jwtUtil.validateToken(accessToken)) {
+    // ✅ 상품 수정 (판매자만 가능)
+    public void updateProduct(Long id, ProductUpdateRequest request, CustomUserDetails userDetails) {
+        if (userDetails == null) {
             throw new RuntimeException("허용되지 않았습니다.");
         }
 
-        String username = jwtUtil.getUsernameFromToken(accessToken);
+        String username = userDetails.getUsername();
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberNotFoundException("사용자를 찾을 수 없습니다."));
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("해당 상품을 찾을 수 없습니다."));
 
-        if (!product.getMember().getUsername().equals(username)) {
+        if (!product.getMember().equals(member)) {
             throw new RuntimeException("수정 권한이 없습니다.");
         }
+
         // 상품 정보 업데이트
         Product updatedProduct = product.toBuilder()
                 .productName(request.getProductName())
@@ -102,5 +104,4 @@ public class ProductService {
         productRepository.save(updatedProduct);
     }
 }
-
 
