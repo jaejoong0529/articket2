@@ -1,9 +1,11 @@
 package kjj.articket2.global.exception;
 
+import kjj.articket2.bid.exception.InvalidBidException;
 import kjj.articket2.member.exception.MemberNotFoundException;
 import kjj.articket2.member.exception.InvalidNicknameException;
 import kjj.articket2.member.exception.InvalidPasswordException;
 import kjj.articket2.member.exception.InvalidUsernameException;
+import kjj.articket2.product.exception.ProductNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,6 +22,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleEmailNotFound(MemberNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<String> handleProductNotFound(ProductNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
     @ExceptionHandler(InvalidPasswordException.class)
     public ResponseEntity<String> handleInvalidPassword(InvalidPasswordException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
@@ -30,6 +36,10 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(InvalidNicknameException.class)
     public ResponseEntity<String> handleInvalidNickname(kjj.articket2.member.exception.InvalidNicknameException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+    @ExceptionHandler(InvalidBidException.class)
+    public ResponseEntity<String> handleInvalidBid(InvalidBidException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }

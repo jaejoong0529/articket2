@@ -93,11 +93,13 @@ public class ProductService {
             throw new RuntimeException("수정 권한이 없습니다.");
         }
         // 상품 정보 업데이트
-        product.setProductName(request.getProductName());
-        product.setDescription(request.getDescription());
-        product.setPrice(request.getPrice());
+        Product updatedProduct = product.toBuilder()
+                .productName(request.getProductName())
+                .description(request.getDescription())
+                .price(request.getPrice())
+                .build();
 
-        productRepository.save(product);
+        productRepository.save(updatedProduct);
     }
 }
 

@@ -43,7 +43,7 @@ public class ProductController {
         productService.deleteProduct(id, accessToken);
         return ResponseEntity.ok("상품이 삭제되었습니다.");
     }
-    // 상품 삭제 (판매자만 가능)
+    // 상품 수정(판매자만 가능)
     @PutMapping("/{id}")
     public ResponseEntity<String> updateProduct(@PathVariable Long id,
                                                 @RequestBody ProductUpdateRequest request,
@@ -51,6 +51,4 @@ public class ProductController {
         productService.updateProduct(id, request, accessToken);
         return ResponseEntity.ok("상품이 수정되었습니다.");
     }
-
-
 }
