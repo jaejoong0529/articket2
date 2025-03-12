@@ -13,6 +13,7 @@ public class ProductCreateRequest {
     private String productName;
     private String description;
     private Integer price;
+    private Integer buyNowPrice;
 //    private String image;
 //    private LocalDateTime createdAt;
 

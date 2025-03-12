@@ -15,6 +15,7 @@ public class ProductResponse {
     private String productName;
     private String description;
     private Integer price;
+    private Integer buyNowPrice;
     private String sellerUsername;
     private LocalDateTime createdAt;
 

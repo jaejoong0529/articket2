@@ -14,6 +14,7 @@ public class ProductConverter {
                 .productName(requestDto.getProductName())
                 .description(requestDto.getDescription())
                 .price(requestDto.getPrice())
+                .buyNowPrice(requestDto.getBuyNowPrice())
                 .build();
     }
     public static ProductResponse fromEntity(Product product) {
@@ -22,6 +23,7 @@ public class ProductConverter {
                 .productName(product.getProductName())
                 .description(product.getDescription())
                 .price(product.getPrice())
+                .buyNowPrice(product.getBuyNowPrice())
                 .sellerUsername(product.getMember().getUsername())
                 .createdAt(product.getCreatedAt())
                 .build();

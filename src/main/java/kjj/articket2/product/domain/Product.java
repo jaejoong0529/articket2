@@ -23,10 +23,14 @@ public class Product {
 
     private String productName;
     private String description;
-    private Integer price;
+    private Integer price;//입찰가격
+    private Integer buyNowPrice;
+    private boolean isSold; // 판매 완료 여부
     private String image;
+
     private LocalDateTime createdAt;
-
-
+    public void markAsSold() {
+        this.isSold = true;
+    }
 
 }
