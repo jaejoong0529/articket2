@@ -7,6 +7,7 @@ import kjj.articket2.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,6 +30,12 @@ public class MemberController {
     public ResponseEntity<String> changePassword(@RequestBody MemberChangePasswordRequest request) {
         memberService.changePassword(request);
         return ResponseEntity.ok("비밀번호가 변경되었습니다.");
+    }
+    @PostMapping("/{memberId}/recharge")
+    public ResponseEntity<String> rechargeMoney(@PathVariable Long memberId,
+                                                @RequestBody MoneyRechargeRequest request) {
+        memberService.rechargeMoney(memberId, request);
+        return ResponseEntity.ok("충전이 완료되었습니다.");
     }
 
 }

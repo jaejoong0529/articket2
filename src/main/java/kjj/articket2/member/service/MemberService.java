@@ -68,7 +68,14 @@ public class MemberService {
             throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
         }
         member.setPassword(passwordEncoder.encode(request.getNewPassword()));
-
         memberRepository.save(member);
+    }
+    public void rechargeMoney(Long memberId, MoneyRechargeRequest request) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+        if (member.getMoney() == null) {
+            member.setMoney(0); // 기본값 설정
+        }
+        member.addMoney(request.getAmount());
     }
 }

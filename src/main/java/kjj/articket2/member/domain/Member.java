@@ -1,9 +1,6 @@
 package kjj.articket2.member.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import kjj.articket2.member.MemberConverter;
 import lombok.*;
 
@@ -25,6 +22,8 @@ public class Member {
     private String nickname;
     private String email;
     private String phoneNumber;
+    @Column(nullable = false)
+    private Integer money = 0;
     private LocalDateTime dateJoined;
     private LocalDateTime lastLogin;
 
@@ -46,5 +45,19 @@ public class Member {
     private String formatted(LocalDateTime dateTime) {//LocalDateTime 객체를 받아서 지정된 형식으로 문자열을 반환
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return dateTime.format(formatter);
+    }
+
+    public void deductMoney(Integer amount) {
+        if (this.money < amount) {
+            throw new IllegalStateException("잔액이 부족합니다.");
+        }
+        this.money -= amount;
+    }
+
+    public void addMoney(Integer amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("충전 금액은 0보다 커야 합니다.");
+        }
+        this.money += amount;
     }
 }
