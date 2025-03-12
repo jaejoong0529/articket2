@@ -13,5 +13,5 @@ public interface BidRepository extends JpaRepository<Bid,Long> {
     Optional<Bid> findTopByProductOrderByBidAmountDesc(Product product);
 
     // 특정 사용자의 입찰 내역 조회
-    List<Bid> findByMember(Member member);
+    List<Bid> findByMemberId(Long memberId);
 }

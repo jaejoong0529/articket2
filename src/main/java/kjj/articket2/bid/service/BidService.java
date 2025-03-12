@@ -2,6 +2,7 @@ package kjj.articket2.bid.service;
 
 import kjj.articket2.bid.domain.Bid;
 import kjj.articket2.bid.dto.BidRequest;
+import kjj.articket2.bid.dto.BidResponse;
 import kjj.articket2.bid.exception.InvalidBidException;
 import kjj.articket2.bid.repository.BidRepository;
 import kjj.articket2.global.jwt.CustomUserDetails;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -55,11 +57,28 @@ public class BidService {
         bidRepository.save(bid);
     }
 
-    // ✅ 내 입찰 내역 조회 (username 사용)
-    public List<Bid> getUserBids(String username) {
-        Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new MemberNotFoundException("사용자를 찾을 수 없습니다."));
-        return bidRepository.findByMember(member);
+    // 특정 사용자의 입찰 내역 조회 (DTO 변환)
+    public List<BidResponse> getUserBids(Long memberId) {
+        return bidRepository.findByMemberId(memberId).stream()
+                .map(bid -> BidResponse.builder()
+                        .bidId(bid.getId())
+                        .productId(bid.getProduct().getId())
+                        .memberId(bid.getMember().getId())
+                        .bidAmount(bid.getBidAmount())
+                        .bidTime(bid.getBidTime())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+
+    // 현재 최고 입찰가 조회
+    public Integer getHighestBid(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("상품을 찾을 수 없습니다."));
+
+        return bidRepository.findTopByProductOrderByBidAmountDesc(product)
+                .map(Bid::getBidAmount)
+                .orElse(0);  // 입찰이 없으면 0 반환
     }
 }
 
