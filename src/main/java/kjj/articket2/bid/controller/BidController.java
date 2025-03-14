@@ -4,6 +4,7 @@ import kjj.articket2.bid.domain.Bid;
 import kjj.articket2.bid.dto.BidRequest;
 import kjj.articket2.bid.dto.BidResponse;
 import kjj.articket2.bid.dto.BuyRequest;
+import kjj.articket2.bid.dto.FinalBidRequest;
 import kjj.articket2.bid.service.BidService;
 import kjj.articket2.global.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,12 @@ public class BidController {
             @AuthenticationPrincipal CustomUserDetails userDetails){
         bidService.bidProduct(request, userDetails);
         return ResponseEntity.ok("입찰되었습니다");
+    }
+    @PostMapping("/finalBid")
+    public ResponseEntity<String> finalBid(
+            @RequestBody FinalBidRequest request){
+        bidService.finalBid(request);
+        return ResponseEntity.ok("최종입찰에 성공하였습니다.");
     }
     // 현재 최고 입찰가 조회
     @GetMapping("/{productId}")

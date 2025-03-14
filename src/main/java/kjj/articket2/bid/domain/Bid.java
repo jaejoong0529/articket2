@@ -28,4 +28,7 @@ public class Bid {
     private Integer bidAmount; // 입찰 금액
 
     private LocalDateTime bidTime; // 입찰 시간
+    public boolean isExpired() {
+        return bidTime.plusHours(24).isBefore(LocalDateTime.now());
+    }
 }

@@ -4,6 +4,7 @@ import kjj.articket2.bid.domain.Bid;
 import kjj.articket2.bid.dto.BidRequest;
 import kjj.articket2.bid.dto.BidResponse;
 import kjj.articket2.bid.dto.BuyRequest;
+import kjj.articket2.bid.dto.FinalBidRequest;
 import kjj.articket2.bid.exception.InvalidBidException;
 import kjj.articket2.bid.repository.BidRepository;
 import kjj.articket2.global.jwt.CustomUserDetails;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -62,6 +64,28 @@ public class BidService {
                 .build();
 
         bidRepository.save(bid);
+    }
+
+    public void finalBid(FinalBidRequest request) {
+        Product product = productRepository.findById(request.getProductId())
+                .orElseThrow(() -> new ProductNotFoundException("상품을 찾을 수 없습니다."));
+        Optional<Bid> highestBid = bidRepository.findTopByProductOrderByBidAmountDesc(product);
+        if (highestBid.isEmpty() || !highestBid.get().isExpired()) {
+            LocalDateTime bidEndTime = highestBid.get().getBidTime().plusHours(24);
+            Duration remainingTime = Duration.between(LocalDateTime.now(), bidEndTime);
+
+            long hours = remainingTime.toHours();
+            long minutes = remainingTime.toMinutesPart();
+            throw new InvalidBidException("아직 입찰이 종료되지 않았습니다. 남은 시간: " + hours + "시간 " + minutes + "분");
+        }
+
+        Bid winningBid = highestBid.get();
+        Member winner = winningBid.getMember();
+
+        winner.deductMoney(winningBid.getBidAmount());
+        memberRepository.save(winner);
+        product.markAsSold();
+        productRepository.save(product);
     }
 
     // 특정 사용자의 입찰 내역 조회 (DTO 변환)
