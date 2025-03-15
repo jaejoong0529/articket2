@@ -23,12 +23,6 @@ public class BidController {
         bidService.bidProduct(request, userDetails);
         return ResponseEntity.ok("입찰되었습니다");
     }
-    @PostMapping("/finalBid")
-    public ResponseEntity<FinalBidResponse> finalBid(
-            @RequestBody FinalBidRequest request){
-        FinalBidResponse response = bidService.finalBid(request);
-        return ResponseEntity.ok(response);
-    }
     // 현재 최고 입찰가 조회
     @GetMapping("/{productId}")
     public ResponseEntity<Integer> getHighestBid(@PathVariable Long productId) {

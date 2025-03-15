@@ -34,10 +34,10 @@ public class BidService {
             throw new RuntimeException("허용되지 않았습니다");
         }
         String username = userDetails.getUsername(); // 사용자 이름 가져오기
-        Product product = productRepository.findById(request.getProductId())
+        Product product = productRepository.findByIdWithLock(request.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException("상품을 찾을 수 없습니다."));
 
-        Member member = memberRepository.findByUsername(username)
+        Member member = memberRepository.findByUsernameWithLock(username)
                 .orElseThrow(() -> new MemberNotFoundException("사용자를 찾을 수 없습니다."));
         if (product.isSold()) {
             throw new InvalidBidException("이미 판매된 상품입니다.");
@@ -95,13 +95,13 @@ public class BidService {
             throw new RuntimeException("허용되지 않았습니다");
         }
         String username = userDetails.getUsername(); // 사용자 이름 가져오기
-        Product product = productRepository.findById(request.getProductId())
+        Product product = productRepository.findByIdWithLock(request.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException("상품을 찾을 수 없습니다."));
         if (product.isSold()) {
             throw new InvalidBidException("이미 판매된 상품입니다.");
         }
 
-        Member buyer = memberRepository.findByUsername(username)
+        Member buyer = memberRepository.findByUsernameWithLock(username)
                 .orElseThrow(() -> new MemberNotFoundException("사용자를 찾을 수 없습니다."));
         if (buyer.getMoney() < request.getBuyAmount()) {
             throw new InvalidBidException("잔액이 부족합니다.");
@@ -110,6 +110,7 @@ public class BidService {
         memberRepository.save(buyer);
         product.markAsSold();
         productRepository.save(product);
+        bidRepository.deleteByProduct(product);
     }
 }
 
