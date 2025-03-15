@@ -1,10 +1,7 @@
 package kjj.articket2.bid.controller;
 
 import kjj.articket2.bid.domain.Bid;
-import kjj.articket2.bid.dto.BidRequest;
-import kjj.articket2.bid.dto.BidResponse;
-import kjj.articket2.bid.dto.BuyRequest;
-import kjj.articket2.bid.dto.FinalBidRequest;
+import kjj.articket2.bid.dto.*;
 import kjj.articket2.bid.service.BidService;
 import kjj.articket2.global.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +24,10 @@ public class BidController {
         return ResponseEntity.ok("입찰되었습니다");
     }
     @PostMapping("/finalBid")
-    public ResponseEntity<String> finalBid(
+    public ResponseEntity<FinalBidResponse> finalBid(
             @RequestBody FinalBidRequest request){
-        bidService.finalBid(request);
-        return ResponseEntity.ok("최종입찰에 성공하였습니다.");
+        FinalBidResponse response = bidService.finalBid(request);
+        return ResponseEntity.ok(response);
     }
     // 현재 최고 입찰가 조회
     @GetMapping("/{productId}")

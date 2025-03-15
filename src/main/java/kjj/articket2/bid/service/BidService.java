@@ -1,10 +1,7 @@
 package kjj.articket2.bid.service;
 
 import kjj.articket2.bid.domain.Bid;
-import kjj.articket2.bid.dto.BidRequest;
-import kjj.articket2.bid.dto.BidResponse;
-import kjj.articket2.bid.dto.BuyRequest;
-import kjj.articket2.bid.dto.FinalBidRequest;
+import kjj.articket2.bid.dto.*;
 import kjj.articket2.bid.exception.InvalidBidException;
 import kjj.articket2.bid.repository.BidRepository;
 import kjj.articket2.global.jwt.CustomUserDetails;
@@ -66,7 +63,7 @@ public class BidService {
         bidRepository.save(bid);
     }
 
-    public void finalBid(FinalBidRequest request) {
+    public FinalBidResponse finalBid(FinalBidRequest request) {
         Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException("상품을 찾을 수 없습니다."));
         Optional<Bid> highestBid = bidRepository.findTopByProductOrderByBidAmountDesc(product);
@@ -86,6 +83,13 @@ public class BidService {
         memberRepository.save(winner);
         product.markAsSold();
         productRepository.save(product);
+        return FinalBidResponse.builder()
+                .productId(product.getId())
+                .winningBidId(winningBid.getId())
+                .winnerId(winner.getId())
+                .finalPrice(winningBid.getBidAmount())
+                .isSold(product.isSold())
+                .build();
     }
 
     // 특정 사용자의 입찰 내역 조회 (DTO 변환)
