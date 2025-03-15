@@ -27,7 +27,7 @@ public class Product {
     private Integer buyNowPrice;
     private boolean isSold; // 판매 완료 여부
     private String image;
-
+    private LocalDateTime endTime;
     private LocalDateTime createdAt;
     public void markAsSold() {
         this.isSold = true;

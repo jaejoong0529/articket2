@@ -39,6 +39,9 @@ public class BidService {
 
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberNotFoundException("사용자를 찾을 수 없습니다."));
+        if (product.isSold()) {
+            throw new InvalidBidException("이미 판매된 상품입니다.");
+        }
 
         // 현재 최고 입찰가 가져오기
         Optional<Bid> highestBid = bidRepository.findTopByProductOrderByBidAmountDesc(product);
@@ -61,35 +64,6 @@ public class BidService {
                 .build();
 
         bidRepository.save(bid);
-    }
-
-    public FinalBidResponse finalBid(FinalBidRequest request) {
-        Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(() -> new ProductNotFoundException("상품을 찾을 수 없습니다."));
-        Optional<Bid> highestBid = bidRepository.findTopByProductOrderByBidAmountDesc(product);
-        if (highestBid.isEmpty() || !highestBid.get().isExpired()) {
-            LocalDateTime bidEndTime = highestBid.get().getBidTime().plusHours(24);
-            Duration remainingTime = Duration.between(LocalDateTime.now(), bidEndTime);
-
-            long hours = remainingTime.toHours();
-            long minutes = remainingTime.toMinutesPart();
-            throw new InvalidBidException("아직 입찰이 종료되지 않았습니다. 남은 시간: " + hours + "시간 " + minutes + "분");
-        }
-
-        Bid winningBid = highestBid.get();
-        Member winner = winningBid.getMember();
-
-        winner.deductMoney(winningBid.getBidAmount());
-        memberRepository.save(winner);
-        product.markAsSold();
-        productRepository.save(product);
-        return FinalBidResponse.builder()
-                .productId(product.getId())
-                .winningBidId(winningBid.getId())
-                .winnerId(winner.getId())
-                .finalPrice(winningBid.getBidAmount())
-                .isSold(product.isSold())
-                .build();
     }
 
     // 특정 사용자의 입찰 내역 조회 (DTO 변환)
