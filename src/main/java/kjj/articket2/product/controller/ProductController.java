@@ -2,6 +2,7 @@ package kjj.articket2.product.controller;
 
 import kjj.articket2.global.jwt.CustomUserDetails;
 import kjj.articket2.product.dto.ProductCreateRequest;
+import kjj.articket2.product.dto.ProductDetailResponse;
 import kjj.articket2.product.dto.ProductResponse;
 import kjj.articket2.product.dto.ProductUpdateRequest;
 import kjj.articket2.product.service.ProductService;
@@ -33,8 +34,8 @@ public class ProductController {
     }
     // 상품 상세 조회
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
-        ProductResponse product = productService.getProductById(id);
+    public ResponseEntity<ProductDetailResponse> getProductById(@PathVariable Long id) {
+        ProductDetailResponse product = productService.getProductById(id);
         return ResponseEntity.ok(product);
     }
 

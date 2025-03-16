@@ -3,6 +3,7 @@ package kjj.articket2.product;
 import kjj.articket2.member.domain.Member;
 import kjj.articket2.product.domain.Product;
 import kjj.articket2.product.dto.ProductCreateRequest;
+import kjj.articket2.product.dto.ProductDetailResponse;
 import kjj.articket2.product.dto.ProductResponse;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,13 @@ public class ProductConverter {
     }
     public static ProductResponse fromEntity(Product product) {
         return ProductResponse.builder()
+                .productName(product.getProductName())
+                .price(product.getPrice())
+                .buyNowPrice(product.getBuyNowPrice())
+                .build();
+    }
+    public static ProductDetailResponse fromDetailEntity(Product product) {
+        return ProductDetailResponse.builder()
                 .id(product.getId())
                 .productName(product.getProductName())
                 .description(product.getDescription())

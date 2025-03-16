@@ -8,6 +8,7 @@ import kjj.articket2.member.repository.MemberRepository;
 import kjj.articket2.product.ProductConverter;
 import kjj.articket2.product.domain.Product;
 import kjj.articket2.product.dto.ProductCreateRequest;
+import kjj.articket2.product.dto.ProductDetailResponse;
 import kjj.articket2.product.dto.ProductResponse;
 import kjj.articket2.product.dto.ProductUpdateRequest;
 import kjj.articket2.product.exception.ProductNotFoundException;
@@ -51,10 +52,10 @@ public class ProductService {
     }
 
     // ✅ 상품 상세 조회
-    public ProductResponse getProductById(Long id) {
+    public ProductDetailResponse getProductById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("해당 상품을 찾을 수 없습니다."));
-        return ProductConverter.fromEntity(product);
+        return ProductConverter.fromDetailEntity(product);
     }
 
     // ✅ 상품 삭제 (판매자만 가능)
