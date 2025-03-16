@@ -11,6 +11,8 @@ import kjj.articket2.member.repository.MemberRepository;
 import kjj.articket2.product.domain.Product;
 import kjj.articket2.product.exception.ProductNotFoundException;
 import kjj.articket2.product.repository.ProductRepository;
+import kjj.articket2.transaction.domain.Transaction;
+import kjj.articket2.transaction.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,7 @@ public class BidService {
     private final BidRepository bidRepository;
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
+    private final TransactionRepository transactionRepository;
 
     public void bidProduct(BidRequest request, CustomUserDetails userDetails) {
         if (userDetails == null) {
@@ -108,9 +111,16 @@ public class BidService {
         }
         buyer.deductMoney(product.getBuyNowPrice());
         memberRepository.save(buyer);
+
         product.markAsSold();
         productRepository.save(product);
+
+        // 🆕 거래 내역 저장
+        Transaction trade = Transaction.createTrade(buyer, product.getMember(), product, product.getBuyNowPrice());
+        transactionRepository.save(trade);
+
         bidRepository.deleteByProduct(product);
+
     }
 }
 

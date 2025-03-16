@@ -6,6 +6,8 @@ import kjj.articket2.member.domain.Member;
 import kjj.articket2.member.repository.MemberRepository;
 import kjj.articket2.product.domain.Product;
 import kjj.articket2.product.repository.ProductRepository;
+import kjj.articket2.transaction.domain.Transaction;
+import kjj.articket2.transaction.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,6 +25,7 @@ public class AuctionScheduler {
     private final ProductRepository productRepository;
     private final BidRepository bidRepository;
     private final MemberRepository memberRepository;
+    private final TransactionRepository transactionRepository;
 
     @Scheduled(fixedRate = 60000) // 1분마다 실행 (실제 운영에서는 1시간 or 10분마다 실행 추천)
     @Transactional
@@ -39,10 +42,14 @@ public class AuctionScheduler {
                 // 최고 입찰자가 존재하면 최종 입찰자로 낙찰 처리
                 Bid winningBid = highestBid.get();
                 Member winner = winningBid.getMember();
+                Member seller = product.getMember();
 
                 // 구매자의 잔액 차감
                 winner.deductMoney(winningBid.getBidAmount());
                 memberRepository.save(winner);
+                // 🆕 거래 내역 저장
+                Transaction trade = Transaction.createTrade(winner, seller, product, winningBid.getBidAmount());
+                transactionRepository.save(trade);
 
                 log.info("🎉 상품 {}이(가) {}님에게 {}원에 낙찰됨!", product.getId(), winner.getUsername(), winningBid.getBidAmount());
             } else {
