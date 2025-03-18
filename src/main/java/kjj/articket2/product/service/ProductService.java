@@ -16,6 +16,7 @@ import kjj.articket2.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,8 +28,9 @@ import java.util.stream.Collectors;
 public class ProductService {
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
+    private final FileService fileService;
 
-    public void createProduct(ProductCreateRequest request, CustomUserDetails userDetails) {
+    public void createProduct(ProductCreateRequest request, MultipartFile image, CustomUserDetails userDetails) {
         if (userDetails == null) {
             throw new RuntimeException("허용되지 않았습니다");
         }
@@ -37,8 +39,11 @@ public class ProductService {
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberNotFoundException("사용자를 찾을 수 없습니다."));
 
+        String imageUrl = (image != null && !image.isEmpty()) ? fileService.saveFile(image) : null;
+
         Product product = ProductConverter.fromDto(request, member).toBuilder()
                 .createdAt(LocalDateTime.now())
+                .image(imageUrl)
                 .build();
 
         productRepository.save(product);

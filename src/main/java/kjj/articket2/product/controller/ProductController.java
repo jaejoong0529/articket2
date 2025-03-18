@@ -8,9 +8,11 @@ import kjj.articket2.product.dto.ProductUpdateRequest;
 import kjj.articket2.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,11 +22,13 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
 
-    @PostMapping("/create")
-    public ResponseEntity<String> createProduct(@RequestBody ProductCreateRequest request,
-                                                @AuthenticationPrincipal CustomUserDetails userDetails)
-                                                               {
-        productService.createProduct(request, userDetails);
+    @PostMapping(value = "/create", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<String> createProduct(
+            @RequestPart("request") ProductCreateRequest request,   // JSON 데이터 받기
+            @RequestPart(value = "image", required = false) MultipartFile image, // 이미지 따로 받기
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        productService.createProduct(request, image, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body("상품이 성공적으로 등록되었습니다.");
     }
     @GetMapping("/")
