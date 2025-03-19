@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import Cookies from "js-cookie"; // js-cookie 라이브러리 import
+import Cookies from "js-cookie";
 
 function ProductList({ onSelectProduct }) {
     const [products, setProducts] = useState([]);
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true); // 로딩 상태 추가
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const token = Cookies.get("token"); // 쿠키에서 토큰 가져오기
+        const token = Cookies.get("token");
 
         if (!token) {
             setError("인증 토큰이 없습니다. 로그인해주세요.");
@@ -25,8 +25,7 @@ function ProductList({ onSelectProduct }) {
                 if (!response.ok) {
                     if (response.status === 401) {
                         setError("인증에 실패했습니다. 다시 로그인해주세요.");
-                        Cookies.remove("token"); // 토큰 삭제
-                        // 로그인 페이지로 이동 또는 토큰 갱신 로직 추가
+                        Cookies.remove("token");
                     } else {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
@@ -45,7 +44,7 @@ function ProductList({ onSelectProduct }) {
     }, []);
 
     if (loading) {
-        return <div style={{ padding: "20px" }}>Loading...</div>; // 로딩 메시지 표시
+        return <div style={{ padding: "20px" }}>Loading...</div>;
     }
 
     if (error) {
@@ -62,11 +61,14 @@ function ProductList({ onSelectProduct }) {
                         <p>시작가: {product.price} 원</p>
                         <p>즉시 구매가: {product.buyNowPrice} 원</p>
                         {product.image && (
-                            <img
-                                src={`http://localhost:8080/uploads/${product.image}`}
-                                alt={product.productName}
-                                width="150"
-                            />
+                            <>
+                                {console.log(product.image)}
+                                <img
+                                    src={`http://localhost:8080${product.image}`}
+                                    alt={product.productName}
+                                    width="150"
+                                />
+                            </>
                         )}
                     </li>
                 ))}

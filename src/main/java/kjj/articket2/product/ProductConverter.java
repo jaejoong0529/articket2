@@ -23,6 +23,7 @@ public class ProductConverter {
                 .productName(product.getProductName())
                 .price(product.getPrice())
                 .buyNowPrice(product.getBuyNowPrice())
+                .image(product.getImage()) // 이미지 URL 설정
                 .build();
     }
     public static ProductDetailResponse fromDetailEntity(Product product) {
@@ -34,6 +35,7 @@ public class ProductConverter {
                 .buyNowPrice(product.getBuyNowPrice())
                 .sellerUsername(product.getMember().getUsername())
                 .createdAt(product.getCreatedAt())
+                .image(product.getImage()) // 이미지 URL 설정
                 .build();
     }
 
