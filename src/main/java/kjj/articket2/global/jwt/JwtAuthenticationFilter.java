@@ -29,9 +29,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = extractToken(request);
+        String token = extractToken(request);//토큰추출
 
-        if (token != null && jwtUtil.validateToken(token)) {
+        if (token != null && jwtUtil.validateToken(token)) {//인증 객체 생성
             String username = jwtUtil.getUsernameFromToken(token);
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
