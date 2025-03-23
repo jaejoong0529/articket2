@@ -2,6 +2,7 @@ package kjj.articket2.member.service;
 
 import kjj.articket2.member.domain.Member;
 import kjj.articket2.member.dto.*;
+import kjj.articket2.member.exception.InvalidPasswordException;
 import kjj.articket2.member.exception.MemberNotFoundException;
 import kjj.articket2.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class MemberService {
 
     //비밀번호찾기
     public void findPassword(MemberFindPasswordRequest request) {
-        Member member = memberRepository.findByNameAndEmail(request.getUsername(), request.getEmail())
+        Member member = memberRepository.findByUsernameAndEmail(request.getUsername(), request.getEmail())
                 .orElseThrow(() -> new MemberNotFoundException("일치하는 정보가 없습니다."));
 
         String tempPassword = generateTempPassword();
@@ -63,16 +64,16 @@ public class MemberService {
     //비밀번호 변경
     public void changePassword(MemberChangePasswordRequest request) {
         Member member = memberRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new MemberNotFoundException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MemberNotFoundException("일치하는 정보가 없습니다."));
         if (!passwordEncoder.matches(request.getCurrentPassword(), member.getPassword())) {
-            throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+            throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
         }
         member.setPassword(passwordEncoder.encode(request.getNewPassword()));
         memberRepository.save(member);
     }
     public void rechargeMoney(Long memberId, MoneyRechargeRequest request) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MemberNotFoundException("일치하는 정보가 없습니다."));
         if (member.getMoney() == null) {
             member.setMoney(0); // 기본값 설정
         }
