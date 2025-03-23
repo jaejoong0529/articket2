@@ -18,7 +18,7 @@ public class JwtUtil {
     private final long accessTokenExpiration = 1000 * 60 * 60; // 1시간
     private final long refreshTokenExpiration = 1000 * 60 * 60 * 24 * 7; // 7일
 
-    @Value("${jwt.secret}")//secret키 주입
+    @Value("${jwt.secret}")
     private String secret;
     private Key key;
 
@@ -28,7 +28,7 @@ public class JwtUtil {
         this.key = Keys.hmacShaKeyFor(bytes);
     }
 
-    // ✅ Access Token 생성 (1시간)
+    //Access Token 생성 (1시간)
     public String generateAccessToken(String username) {
         return Jwts.builder()
                 .setSubject(username)//주체설정
@@ -40,7 +40,7 @@ public class JwtUtil {
     }
 
 
-    // ✅ Refresh Token 생성 (7일)
+    //Refresh Token 생성 (7일)
     public String generateRefreshToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
@@ -50,41 +50,21 @@ public class JwtUtil {
                 .compact();
     }
 
-    // ✅ JWT에서 클레임 추출
-    public Claims extractClaims(String token) {//문자열 토큰을 Claims형태로 변환
-        return Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody();
-    }
-
-    // ✅ JWT에서 사용자 이름 추출
-    public String extractUsername(String token) {//클레임 추출하고 클레임에서 주체 추출
-        return extractClaims(token).getSubject();
-    }
-
-    // ✅ JWT 만료 여부 확인
-    public boolean isTokenExpired(String token) {
-        return extractClaims(token).getExpiration().before(new Date());
-    }
-
+    //JWT에서 사용자 이름 추출
     public String getUsernameFromToken(String token) {//키값을 사용해서 추출
         return Jwts.parserBuilder().setSigningKey(key).build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
     }
-
-    public boolean validateToken(String token) {//유효성 검사
+    //유효성 검사
+    public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
-        } catch (ExpiredJwtException e) {
-            System.out.println("토큰 만료");
         } catch (JwtException e) {
-            System.out.println("유효하지않은 토큰");
+            return false;
         }
-        return false;
     }
-
 }
+
