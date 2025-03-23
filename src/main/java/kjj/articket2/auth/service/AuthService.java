@@ -14,6 +14,7 @@ import kjj.articket2.member.domain.Member;
 import kjj.articket2.member.exception.InvalidNicknameException;
 import kjj.articket2.member.exception.InvalidPasswordException;
 import kjj.articket2.member.exception.InvalidUsernameException;
+import kjj.articket2.member.exception.MemberNotFoundException;
 import kjj.articket2.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -46,12 +47,14 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .dateJoined(LocalDateTime.now())
                 .lastLogin(LocalDateTime.now())
+                .money(0) // money 값을 0으로 설정
                 .build();
         memberRepository.save(member);
     }
 
-    public MemberLoginResponse login(MemberLoginRequest request, HttpServletResponse response1) {
-        Member member = memberRepository.findByUsername(request.getUsername()).orElseThrow();
+    public MemberLoginResponse login(MemberLoginRequest request, HttpServletResponse response) {
+        Member member = memberRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new MemberNotFoundException("일치하는 정보가 없습니다."));
         passwordMatches(request.getPassword(), member.getPassword());
 
         String accessToken = jwtUtil.generateAccessToken(request.getUsername());
@@ -63,7 +66,7 @@ public class AuthService {
         cookie.setHttpOnly(false);
         cookie.setSecure(false);
         cookie.setPath("/");
-        response1.addCookie(cookie);
+        response.addCookie(cookie);
         return MemberConverter.toLoginResponse(accessToken, refreshToken);
     }
 

@@ -1,5 +1,6 @@
 package kjj.articket2.member.domain;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.*;
 import kjj.articket2.member.MemberConverter;
 import lombok.*;
@@ -23,9 +24,10 @@ public class Member {
     private String email;
     private String phoneNumber;
     @Column(nullable = false)
-    private Integer money = 0;
+    private Integer money = 0; // 기본값 0 설정
     private LocalDateTime dateJoined;
     private LocalDateTime lastLogin;
+
 
     /**
      *회원가입 날짜
