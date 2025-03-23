@@ -1,5 +1,6 @@
 package kjj.articket2.member.service;
 
+import kjj.articket2.global.jwt.CustomUserDetails;
 import kjj.articket2.member.domain.Member;
 import kjj.articket2.member.dto.*;
 import kjj.articket2.member.exception.InvalidPasswordException;
@@ -71,8 +72,13 @@ public class MemberService {
         member.setPassword(passwordEncoder.encode(request.getNewPassword()));
         memberRepository.save(member);
     }
-    public void rechargeMoney(Long memberId, MoneyRechargeRequest request) {
-        Member member = memberRepository.findById(memberId)
+    //돈 충전하기
+    public void rechargeMoney(MoneyRechargeRequest request, CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            throw new RuntimeException("허용되지 않았습니다");
+        }
+        String username = userDetails.getUsername(); // 사용자 이름 가져오기
+        Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new MemberNotFoundException("일치하는 정보가 없습니다."));
         if (member.getMoney() == null) {
             member.setMoney(0); // 기본값 설정

@@ -31,11 +31,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
     @ExceptionHandler(InvalidUsernameException.class)
-    public ResponseEntity<String> handleInvalidUsername(kjj.articket2.member.exception.InvalidUsernameException ex) {
+    public ResponseEntity<String> handleInvalidUsername(InvalidUsernameException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
     @ExceptionHandler(InvalidNicknameException.class)
-    public ResponseEntity<String> handleInvalidNickname(kjj.articket2.member.exception.InvalidNicknameException ex) {
+    public ResponseEntity<String> handleInvalidNickname(InvalidNicknameException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
     @ExceptionHandler(InvalidBidException.class)
