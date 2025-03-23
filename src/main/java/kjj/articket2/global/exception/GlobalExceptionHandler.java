@@ -1,10 +1,7 @@
 package kjj.articket2.global.exception;
 
 import kjj.articket2.bid.exception.InvalidBidException;
-import kjj.articket2.member.exception.MemberNotFoundException;
-import kjj.articket2.member.exception.InvalidNicknameException;
-import kjj.articket2.member.exception.InvalidPasswordException;
-import kjj.articket2.member.exception.InvalidUsernameException;
+import kjj.articket2.member.exception.*;
 import kjj.articket2.product.exception.ProductNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +37,10 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(InvalidBidException.class)
     public ResponseEntity<String> handleInvalidBid(InvalidBidException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<String> handleAuthentication(AuthenticationException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }
