@@ -44,12 +44,7 @@ public class AuthService {
         if (memberRepository.existsByNickname(request.getNickname())) {
             throw new InvalidNicknameException("닉네임이 중복입니다.");
         }
-        Member member = MemberConverter.fromDto(request).toBuilder()
-                .password(passwordEncoder.encode(request.getPassword()))
-                .dateJoined(LocalDateTime.now())
-                .lastLogin(LocalDateTime.now())
-                .money(0) // money 값을 0으로 설정
-                .build();
+        Member member = MemberConverter.fromDto(request, passwordEncoder);
         memberRepository.save(member);
     }
 
@@ -58,6 +53,8 @@ public class AuthService {
         Member member = memberRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new MemberNotFoundException("일치하는 정보가 없습니다."));
         passwordMatches(request.getPassword(), member.getPassword());
+        member.setLastLogin(LocalDateTime.now());;
+        memberRepository.save(member);
         String accessToken = jwtUtil.generateAccessToken(request.getUsername());
         String refreshToken = jwtUtil.generateRefreshToken(request.getUsername());
         refreshTokenRepository.save(new RefreshToken(request.getUsername(), refreshToken));

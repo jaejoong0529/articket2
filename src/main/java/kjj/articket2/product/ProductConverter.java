@@ -35,6 +35,7 @@ public class ProductConverter {
                 .buyNowPrice(product.getBuyNowPrice())
                 .sellerUsername(product.getMember().getUsername())
                 .createdAt(product.getCreatedAt())
+                .endTime(product.getEndTime())
                 .image(product.getImage()) // 이미지 URL 설정
                 .build();
     }

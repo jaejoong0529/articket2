@@ -17,5 +17,6 @@ public class ProductDetailResponse {
     private Integer buyNowPrice;
     private String sellerUsername;
     private LocalDateTime createdAt;
+    private LocalDateTime endTime;
     private String image; // 이미지 URL 추가
 }

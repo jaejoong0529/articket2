@@ -27,7 +27,6 @@ public class ProductController {
             @RequestPart("request") ProductCreateRequest request,   // JSON 데이터 받기
             @RequestPart(value = "image", required = false) MultipartFile image, // 이미지 따로 받기
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-
         productService.createProduct(request, image, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body("상품이 성공적으로 등록되었습니다.");
     }

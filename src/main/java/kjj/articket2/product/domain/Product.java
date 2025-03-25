@@ -20,7 +20,6 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)  // 판매자 정보
     @JoinColumn(name = "member_id")
     private Member member;
-
     private String productName;
     private String description;
     private Integer price;//입찰가격
