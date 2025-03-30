@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import kjj.articket2.auth.dto.MemberLoginRequest;
 import kjj.articket2.auth.dto.MemberLoginResponse;
 import kjj.articket2.auth.dto.MemberSignUpRequest;
+import kjj.articket2.global.exception.InvalidTokenException;
 import kjj.articket2.global.jwt.JwtUtil;
 import kjj.articket2.global.jwt.RefreshToken;
 import kjj.articket2.global.jwt.RefreshTokenRepository;
@@ -38,14 +39,19 @@ public class AuthService {
 
     //회원가입
     public void signup(MemberSignUpRequest request) {
+        validateDuplicateUser(request);
+        Member member = MemberConverter.fromDto(request, passwordEncoder);
+        memberRepository.save(member);
+    }
+
+    //중복확인
+    private void validateDuplicateUser(MemberSignUpRequest request) {
         if (memberRepository.existsByUsername(request.getUsername())) {
             throw new InvalidUsernameException("아이디가 중복입니다.");
         }
         if (memberRepository.existsByNickname(request.getNickname())) {
             throw new InvalidNicknameException("닉네임이 중복입니다.");
         }
-        Member member = MemberConverter.fromDto(request, passwordEncoder);
-        memberRepository.save(member);
     }
 
     //로그인
@@ -53,7 +59,7 @@ public class AuthService {
         Member member = memberRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new MemberNotFoundException("일치하는 정보가 없습니다."));
         passwordMatches(request.getPassword(), member.getPassword());
-        member.setLastLogin(LocalDateTime.now());;
+        member.setLastLogin(LocalDateTime.now());
         memberRepository.save(member);
         String accessToken = jwtUtil.generateAccessToken(request.getUsername());
         String refreshToken = jwtUtil.generateRefreshToken(request.getUsername());
@@ -70,27 +76,30 @@ public class AuthService {
     }
 
     //로그아웃
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
+    public void logout(HttpServletRequest request) {
+        String token = extractToken(request);
+        if (token == null) return;
+        String username = jwtUtil.getUsernameFromToken(token);
+        refreshTokenRepository.deleteById(username);
+        SecurityContextHolder.clearContext();
+    }
+
+    //토큰추출
+    private String extractToken(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
-            String username = jwtUtil.getUsernameFromToken(token);
-            refreshTokenRepository.deleteById(username);
-            SecurityContextHolder.clearContext();
-        }
-        response.setStatus(HttpServletResponse.SC_OK);
+        return (token != null && token.startsWith("Bearer ")) ? token.substring(7) : null;
     }
 
     //리프레시토큰
     public Map<String, String> refreshToken(String refreshToken) {
         if (refreshToken == null) {
-            throw new IllegalArgumentException("유효하지않은 토큰입니다");
+            throw new InvalidTokenException("유효하지않은 토큰입니다");
         }
         RefreshToken storedToken = refreshTokenRepository.findByToken(refreshToken)
-                .orElseThrow(() -> new IllegalArgumentException("유효하지않은 토큰입니다"));
+                .orElseThrow(() -> new InvalidTokenException("유효하지않은 토큰입니다"));
 
         if (!jwtUtil.validateToken(storedToken.getToken())) {
-            throw new IllegalArgumentException("유효하지않은 토큰입니다");
+            throw new InvalidTokenException("유효하지않은 토큰입니다");
         }
         String username = storedToken.getUsername();
         String newAccessToken = jwtUtil.generateAccessToken(username);
