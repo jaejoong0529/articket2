@@ -9,14 +9,10 @@ import java.time.LocalDateTime;
 @Builder
 @Getter
 public class ProductCreateRequest {
-//    private Long memberId;
-
     private String productName;
     private String description;
     private Integer price;
     private Integer buyNowPrice;
-//    private MultipartFile image;
-//    private String image;
-//    private LocalDateTime createdAt;
+
 
 }

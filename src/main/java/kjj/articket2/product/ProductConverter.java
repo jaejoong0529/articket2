@@ -5,17 +5,23 @@ import kjj.articket2.product.domain.Product;
 import kjj.articket2.product.dto.ProductCreateRequest;
 import kjj.articket2.product.dto.ProductDetailResponse;
 import kjj.articket2.product.dto.ProductResponse;
+import kjj.articket2.product.dto.ProductUpdateRequest;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 
 @Component
 public class ProductConverter {
-    public static Product fromDto(ProductCreateRequest requestDto, Member member) {
+    public static Product fromDto(ProductCreateRequest request, Member member,String imageUrl) {
         return Product.builder()
                 .member(member)
-                .productName(requestDto.getProductName())
-                .description(requestDto.getDescription())
-                .price(requestDto.getPrice())
-                .buyNowPrice(requestDto.getBuyNowPrice())
+                .productName(request.getProductName())
+                .description(request.getDescription())
+                .price(request.getPrice())
+                .buyNowPrice(request.getBuyNowPrice())
+                .createdAt(LocalDateTime.now())
+                .endTime(LocalDateTime.now().plusHours(1))
+                .image(imageUrl)
                 .build();
     }
     public static ProductResponse fromEntity(Product product) {
@@ -39,8 +45,14 @@ public class ProductConverter {
                 .image(product.getImage()) // 이미지 URL 설정
                 .build();
     }
-
-
+    public static Product fromUpdateDto(ProductUpdateRequest request, Product product, String imageUrl) {
+        return product.toBuilder()
+                .productName(request.getProductName())
+                .description(request.getDescription())
+                .price(request.getPrice())
+                .image(imageUrl)
+                .build();
+    }
 }
 
 

@@ -30,7 +30,7 @@ public class ProductController {
         productService.createProduct(request, image, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body("상품이 성공적으로 등록되었습니다.");
     }
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
         List<ProductResponse> products = productService.getAllProducts();
         return ResponseEntity.ok(products);
@@ -50,11 +50,12 @@ public class ProductController {
         return ResponseEntity.ok("상품이 삭제되었습니다.");
     }
     // 상품 수정(판매자만 가능)
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<String> updateProduct(@PathVariable Long id,
-                                                @RequestBody ProductUpdateRequest request,
+                                                @RequestPart("request") ProductUpdateRequest request,
+                                                @RequestPart(value = "image", required = false) MultipartFile image,
                                                 @AuthenticationPrincipal CustomUserDetails userDetails) {
-        productService.updateProduct(id, request, userDetails);
+        productService.updateProduct(id, request, image, userDetails);
         return ResponseEntity.ok("상품이 수정되었습니다.");
     }
 }
