@@ -26,6 +26,7 @@ public class ProductConverter {
     }
     public static ProductResponse fromEntity(Product product) {
         return ProductResponse.builder()
+                .id(product.getId())
                 .productName(product.getProductName())
                 .price(product.getPrice())
                 .buyNowPrice(product.getBuyNowPrice())
