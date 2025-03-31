@@ -29,7 +29,7 @@ public class Product {
     private LocalDateTime endTime;
     private LocalDateTime createdAt;
     @Enumerated(EnumType.STRING)  // ENUM을 문자열로 저장
-    private ProductCategory category;
+    private Category category;
     public void markAsSold() {
         this.isSold = true;
     }

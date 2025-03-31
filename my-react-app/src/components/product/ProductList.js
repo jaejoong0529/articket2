@@ -10,7 +10,12 @@ function ProductList() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        getProducts()
+        fetchProducts();
+    }, []);
+
+    const fetchProducts = (category) => {
+        setLoading(true);
+        getProducts(category)
             .then((response) => {
                 setProducts(response.data);
                 setLoading(false);
@@ -26,7 +31,7 @@ function ProductList() {
                 }
                 setLoading(false);
             });
-    }, []);
+    };
 
     const handleLogout = () => {
         logout();
@@ -34,23 +39,32 @@ function ProductList() {
     };
 
     if (loading) {
-        return <div style={{ padding: "20px" }}>상품 목록을 불러오는 중입니다...</div>;
+        return <div>상품 목록을 불러오는 중입니다...</div>;
     }
 
     if (error) {
-        return <div style={{ padding: "20px", color: "red" }}>{error}</div>;
+        return <div style={{ color: "red" }}>{error}</div>;
     }
 
+    const categories = ["전체", "ELECTRONICS", "FASHION", "BOOKS", "SPORTS", "BEAUTY"]; // 카테고리 목록에 "전체" 추가
+
     return (
-        <div style={{ padding: "20px" }}>
+        <div>
             <h1>상품 목록</h1>
             <button onClick={handleLogout}>로그아웃</button>
             <Link to="/products/create">
                 <button>상품 등록</button>
             </Link>
-            <Link to="/recharge"> {/* 돈 충전 페이지로 이동하는 버튼 추가 */}
+            <Link to="/recharge">
                 <button>돈 충전</button>
             </Link>
+            <div>
+                {categories.map((category) => (
+                    <button key={category} onClick={() => fetchProducts(category === "전체" ? null : category)}>
+                        {category}
+                    </button>
+                ))}
+            </div>
             <ul>
                 {products.map((product) => (
                     <li key={product.id}>

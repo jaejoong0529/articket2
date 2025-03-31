@@ -1,6 +1,6 @@
 package kjj.articket2.product.domain;
 
-public enum ProductCategory {
+public enum Category {
     ELECTRONICS,
     FASHION,
     BOOKS,

@@ -1,7 +1,7 @@
 package kjj.articket2.product.controller;
 
 import kjj.articket2.global.jwt.CustomUserDetails;
-import kjj.articket2.product.domain.ProductCategory;
+import kjj.articket2.product.domain.Category;
 import kjj.articket2.product.dto.ProductCreateRequest;
 import kjj.articket2.product.dto.ProductDetailResponse;
 import kjj.articket2.product.dto.ProductResponse;
@@ -40,7 +40,7 @@ public class ProductController {
     }
     //카테고리별 상품 조회
     @GetMapping("/category/{category}")
-    public ResponseEntity<List<ProductResponse>> getProductsByCategory(@PathVariable ProductCategory category) {
+    public ResponseEntity<List<ProductResponse>> getProductsByCategory(@PathVariable Category category) {
         List<ProductResponse> products = productService.getProductsByCategory(category);
         return ResponseEntity.ok(products);
     }

@@ -3,9 +3,15 @@ import { getAccessToken } from '../member/authService';
 
 const API_BASE_URL = "http://localhost:8080/product";
 
-export const getProducts = async () => {
+export const getProducts = async (category) => {
     const token = getAccessToken();
-    return axios.get(API_BASE_URL, {
+    let url = API_BASE_URL;
+
+    if (category) {
+        url = `${API_BASE_URL}/category/${category}`;
+    }
+
+    return axios.get(url, {
         headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",

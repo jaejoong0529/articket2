@@ -22,6 +22,7 @@ public class ProductConverter {
                 .createdAt(LocalDateTime.now())
                 .endTime(LocalDateTime.now().plusHours(1))
                 .image(imageUrl)
+                .category(request.getCategory())  // 카테고리 추가
                 .build();
     }
     public static ProductResponse fromEntity(Product product) {

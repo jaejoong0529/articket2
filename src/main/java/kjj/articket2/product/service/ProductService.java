@@ -1,14 +1,13 @@
 package kjj.articket2.product.service;
 
 import kjj.articket2.global.jwt.CustomUserDetails;
-import kjj.articket2.global.jwt.JwtUtil;
 import kjj.articket2.member.domain.Member;
 import kjj.articket2.member.exception.AuthenticationException;
 import kjj.articket2.member.exception.MemberNotFoundException;
 import kjj.articket2.member.repository.MemberRepository;
 import kjj.articket2.product.ProductConverter;
 import kjj.articket2.product.domain.Product;
-import kjj.articket2.product.domain.ProductCategory;
+import kjj.articket2.product.domain.Category;
 import kjj.articket2.product.dto.ProductCreateRequest;
 import kjj.articket2.product.dto.ProductDetailResponse;
 import kjj.articket2.product.dto.ProductResponse;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,7 +46,7 @@ public class ProductService {
     }
 
     //카테고리별 상품 목록 조회
-    public List<ProductResponse> getProductsByCategory(ProductCategory category) {
+    public List<ProductResponse> getProductsByCategory(Category category) {
         List<Product> products = productRepository.findByCategory(category);
         return products.stream()
                 .map(ProductConverter::fromEntity)
