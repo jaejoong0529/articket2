@@ -12,6 +12,8 @@ import Home from './components/Home';
 import ProductList from './components/product/ProductList';
 import ProductDetail from './components/product/ProductDetail';
 import CreateProduct from "./components/product/CreateProduct";
+import ProductUpdate from './components/product/ProductUpdate';
+import ProductDelete from './components/product/ProductDelete';
 
 function App() {
     return (
@@ -29,6 +31,8 @@ function App() {
                 <Route path="/products" element={<ProductList />} />
                 <Route path="/products/:id" element={<ProductDetail />} />
                 <Route path="/products/create" element={<CreateProduct />} />
+                <Route path="/products/update/:id" element={<ProductUpdate />} />
+                <Route path="/products/delete/:id" element={<ProductDelete />} />
             </Routes>
         </Router>
     );

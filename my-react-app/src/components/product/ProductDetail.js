@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom"; // Link 추가
 import { getProductDetail } from "./productService";
 
 function ProductDetail() {
@@ -67,6 +67,14 @@ function ProductDetail() {
             )}
             {imageError && <p>이미지를 불러오는데 실패했습니다.</p>}
             <p>{product.description}</p>
+            <div>
+                <Link to={`/products/update/${product.id}`}>
+                    <button>수정</button>
+                </Link>
+                <Link to={`/products/delete/${product.id}`}>
+                    <button>삭제</button>
+                </Link>
+            </div>
         </div>
     );
 }
