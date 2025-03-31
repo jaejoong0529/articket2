@@ -1,6 +1,7 @@
 package kjj.articket2.product.controller;
 
 import kjj.articket2.global.jwt.CustomUserDetails;
+import kjj.articket2.product.domain.ProductCategory;
 import kjj.articket2.product.dto.ProductCreateRequest;
 import kjj.articket2.product.dto.ProductDetailResponse;
 import kjj.articket2.product.dto.ProductResponse;
@@ -22,6 +23,7 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
 
+    //상품등록
     @PostMapping(value = "/create", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<String> createProduct(
             @RequestPart("request") ProductCreateRequest request,   // JSON 데이터 받기
@@ -30,11 +32,19 @@ public class ProductController {
         productService.createProduct(request, image, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body("상품이 성공적으로 등록되었습니다.");
     }
+    //상품 전체 조회
     @GetMapping()
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
         List<ProductResponse> products = productService.getAllProducts();
         return ResponseEntity.ok(products);
     }
+    //카테고리별 상품 조회
+    @GetMapping("/category/{category}")
+    public ResponseEntity<List<ProductResponse>> getProductsByCategory(@PathVariable ProductCategory category) {
+        List<ProductResponse> products = productService.getProductsByCategory(category);
+        return ResponseEntity.ok(products);
+    }
+
     // 상품 상세 조회
     @GetMapping("/{id}")
     public ResponseEntity<ProductDetailResponse> getProductById(@PathVariable Long id) {

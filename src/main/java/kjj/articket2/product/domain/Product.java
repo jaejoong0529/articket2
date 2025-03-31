@@ -28,6 +28,8 @@ public class Product {
     private String image;
     private LocalDateTime endTime;
     private LocalDateTime createdAt;
+    @Enumerated(EnumType.STRING)  // ENUM을 문자열로 저장
+    private ProductCategory category;
     public void markAsSold() {
         this.isSold = true;
     }

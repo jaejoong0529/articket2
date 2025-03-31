@@ -8,6 +8,7 @@ import kjj.articket2.member.exception.MemberNotFoundException;
 import kjj.articket2.member.repository.MemberRepository;
 import kjj.articket2.product.ProductConverter;
 import kjj.articket2.product.domain.Product;
+import kjj.articket2.product.domain.ProductCategory;
 import kjj.articket2.product.dto.ProductCreateRequest;
 import kjj.articket2.product.dto.ProductDetailResponse;
 import kjj.articket2.product.dto.ProductResponse;
@@ -42,6 +43,14 @@ public class ProductService {
     //상품 목록 조회
     public List<ProductResponse> getAllProducts() {
         return productRepository.findAll().stream()
+                .map(ProductConverter::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    //카테고리별 상품 목록 조회
+    public List<ProductResponse> getProductsByCategory(ProductCategory category) {
+        List<Product> products = productRepository.findByCategory(category);
+        return products.stream()
                 .map(ProductConverter::fromEntity)
                 .collect(Collectors.toList());
     }
