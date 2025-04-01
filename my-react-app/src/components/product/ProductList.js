@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import { getProducts } from "./productService";
+import { getHighestBid } from "../bid/bidService"; // getHighestBid 추가
 import { logout } from "../member/authService";
 
 function ProductList() {
@@ -8,6 +9,7 @@ function ProductList() {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const [highestBids, setHighestBids] = useState({}); // 최고 입찰가 상태 추가
 
     useEffect(() => {
         fetchProducts();
@@ -19,6 +21,7 @@ function ProductList() {
             .then((response) => {
                 setProducts(response.data);
                 setLoading(false);
+                fetchHighestBids(response.data); // 최고 입찰가 가져오기
             })
             .catch((err) => {
                 console.error("Error fetching products:", err);
@@ -31,6 +34,19 @@ function ProductList() {
                 }
                 setLoading(false);
             });
+    };
+
+    const fetchHighestBids = async (products) => {
+        const bids = {};
+        for (const product of products) {
+            try {
+                const bid = await getHighestBid(product.id);
+                bids[product.id] = bid;
+            } catch (error) {
+                console.error(`Error fetching highest bid for product ${product.id}:`, error);
+            }
+        }
+        setHighestBids(bids);
     };
 
     const handleLogout = () => {
@@ -46,7 +62,7 @@ function ProductList() {
         return <div style={{ color: "red" }}>{error}</div>;
     }
 
-    const categories = ["전체", "ELECTRONICS", "FASHION", "BOOKS", "SPORTS", "BEAUTY"]; // 카테고리 목록에 "전체" 추가
+    const categories = ["전체", "ELECTRONICS", "FASHION", "BOOKS", "SPORTS", "BEAUTY"];
 
     return (
         <div>
@@ -71,6 +87,7 @@ function ProductList() {
                         <h3>{product.productName}</h3>
                         <p>시작가: {product.price} 원</p>
                         <p>즉시 구매가: {product.buyNowPrice} 원</p>
+                        <p>현재 최고 입찰가: {highestBids[product.id] || "입찰 없음"} 원</p> {/* 최고 입찰가 표시 */}
                         {product.image && (
                             <img
                                 src={`http://localhost:8080${product.image}`}

@@ -14,6 +14,10 @@ import ProductDetail from './components/product/ProductDetail';
 import CreateProduct from "./components/product/CreateProduct";
 import ProductUpdate from './components/product/ProductUpdate';
 import ProductDelete from './components/product/ProductDelete';
+import BidProduct from './components/bid/BidProduct';
+import HighestBid from './components/bid/HighestBid';
+import UserBids from './components/bid/UserBids';
+import BuyProduct from './components/bid/BuyProduct';
 
 function App() {
     return (
@@ -33,6 +37,10 @@ function App() {
                 <Route path="/products/create" element={<CreateProduct />} />
                 <Route path="/products/update/:id" element={<ProductUpdate />} />
                 <Route path="/products/delete/:id" element={<ProductDelete />} />
+                <Route path="/bid/:productId" element={<BidProduct />} />
+                <Route path="/highestBid/:productId" element={<HighestBid />} />
+                <Route path="/userBids/:memberId" element={<UserBids />} />
+                <Route path="/buy/:productId" element={<BuyProduct />} />
             </Routes>
         </Router>
     );

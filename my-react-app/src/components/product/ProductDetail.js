@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom"; // Link 추가
+import { useParams, Link } from "react-router-dom";
 import { getProductDetail } from "./productService";
+import { getHighestBid } from "../bid/bidService"; // getHighestBid 추가
 
 function ProductDetail() {
     const { id } = useParams();
@@ -8,6 +9,7 @@ function ProductDetail() {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const [imageError, setImageError] = useState(false);
+    const [highestBid, setHighestBid] = useState(0); // 최고 입찰가 상태 추가
 
     useEffect(() => {
         const fetchProductDetail = async () => {
@@ -16,6 +18,8 @@ function ProductDetail() {
             try {
                 const response = await getProductDetail(id);
                 setProduct(response.data);
+                const bidResponse = await getHighestBid(id); // 최고 입찰가 가져오기
+                setHighestBid(bidResponse);
             } catch (err) {
                 console.error("Error fetching product detail:", err);
                 setError("상품 상세 정보를 불러오는데 실패했습니다. 다시 시도해주세요.");
@@ -57,6 +61,7 @@ function ProductDetail() {
             <p>즉시 구매가: {formatPrice(product.buyNowPrice)} 원</p>
             <p>등록일: {product.createdAt}</p>
             <p>종료일: {product.endTime}</p>
+            <p>현재 최고 입찰가: {formatPrice(highestBid)} 원</p> {/* 최고 입찰가 표시 */}
             {product.image && (
                 <img
                     src={`http://localhost:8080${product.image}`}
@@ -73,6 +78,12 @@ function ProductDetail() {
                 </Link>
                 <Link to={`/products/delete/${product.id}`}>
                     <button>삭제</button>
+                </Link>
+                <Link to={`/buy/${product.id}`}>
+                    <button>즉시 구매</button>
+                </Link>
+                <Link to={`/bid/${product.id}`}>
+                    <button>입찰하기</button>
                 </Link>
             </div>
         </div>

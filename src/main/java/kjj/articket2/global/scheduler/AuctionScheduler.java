@@ -36,7 +36,7 @@ public class AuctionScheduler {
         List<Product> expiredProducts = productRepository.findAllByEndTimeBeforeAndIsSoldFalse(LocalDateTime.now());
 
         for (Product product : expiredProducts) {
-            Optional<Bid> highestBid = bidRepository.findTopByProductOrderByBidAmountDesc(product);
+            Optional<Bid> highestBid = bidRepository.findTopByProductIdOrderByBidAmountDesc(product.getId());
 
             if (highestBid.isPresent()) {
                 // 최고 입찰자가 존재하면 최종 입찰자로 낙찰 처리
