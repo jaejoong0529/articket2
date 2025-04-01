@@ -11,5 +11,5 @@ public class ProductCreateRequest {
     private String description;
     private Integer price;
     private Integer buyNowPrice;
-    private Category category;  // 추가
+    private Category category;
 }

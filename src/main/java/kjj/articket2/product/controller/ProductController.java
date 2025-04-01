@@ -26,18 +26,20 @@ public class ProductController {
     //상품등록
     @PostMapping(value = "/create", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<String> createProduct(
-            @RequestPart("request") ProductCreateRequest request,   // JSON 데이터 받기
-            @RequestPart(value = "image", required = false) MultipartFile image, // 이미지 따로 받기
+            @RequestPart("request") ProductCreateRequest request,
+            @RequestPart(value = "image", required = false) MultipartFile image,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         productService.createProduct(request, image, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body("상품이 성공적으로 등록되었습니다.");
     }
+
     //상품 전체 조회
     @GetMapping()
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
         List<ProductResponse> products = productService.getAllProducts();
         return ResponseEntity.ok(products);
     }
+
     //카테고리별 상품 조회
     @GetMapping("/category/{category}")
     public ResponseEntity<List<ProductResponse>> getProductsByCategory(@PathVariable Category category) {
@@ -59,6 +61,7 @@ public class ProductController {
         productService.deleteProduct(id, userDetails);
         return ResponseEntity.ok("상품이 삭제되었습니다.");
     }
+
     // 상품 수정(판매자만 가능)
     @PutMapping(value = "/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<String> updateProduct(@PathVariable Long id,
