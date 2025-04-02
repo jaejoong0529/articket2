@@ -20,6 +20,9 @@ public class Member {
     private String nickname;
     private String email;
     private String phoneNumber;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
     @Builder.Default
     private int money = 0;
     @Builder.Default

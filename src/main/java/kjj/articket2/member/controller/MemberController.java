@@ -37,5 +37,4 @@ public class MemberController {
         memberService.rechargeMoney(request, userDetails);
         return ResponseEntity.ok("충전이 완료되었습니다.");
     }
-
 }

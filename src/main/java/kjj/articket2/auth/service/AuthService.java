@@ -61,7 +61,8 @@ public class AuthService {
         passwordMatches(request.getPassword(), member.getPassword());
         member.setLastLogin(LocalDateTime.now());
         memberRepository.save(member);
-        String accessToken = jwtUtil.generateAccessToken(request.getUsername());
+        String role = member.getRole().name();
+        String accessToken = jwtUtil.generateAccessToken(request.getUsername(),role);
         String refreshToken = jwtUtil.generateRefreshToken(request.getUsername());
         refreshTokenRepository.save(new RefreshToken(request.getUsername(), refreshToken));
         response.setHeader("Authorization", "Bearer " + accessToken);
@@ -102,7 +103,8 @@ public class AuthService {
             throw new InvalidTokenException("유효하지않은 토큰입니다");
         }
         String username = storedToken.getUsername();
-        String newAccessToken = jwtUtil.generateAccessToken(username);
+        String role = jwtUtil.getRoleFromToken(refreshToken);
+        String newAccessToken = jwtUtil.generateAccessToken(username,role);
         return Map.of("accessToken", newAccessToken);
     }
 }

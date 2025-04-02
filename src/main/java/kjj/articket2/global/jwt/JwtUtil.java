@@ -29,9 +29,10 @@ public class JwtUtil {
     }
 
     //Access Token 생성 (1시간)
-    public String generateAccessToken(String username) {
+    public String generateAccessToken(String username,String role) {
         return Jwts.builder()
                 .setSubject(username)//주체설정
+                .claim("role", role) // 역할 그대로 저장
                 .setIssuedAt(new Date())//발행시간
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiration))//만료시간
                 .signWith(SignatureAlgorithm.HS256, key)//토큰서명
@@ -56,6 +57,13 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+    // 🔹 JWT에서 역할(Role) 추출
+    public String getRoleFromToken(String token) {
+        return Jwts.parserBuilder().setSigningKey(key).build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role", String.class);
     }
     //유효성 검사
     public boolean validateToken(String token) {

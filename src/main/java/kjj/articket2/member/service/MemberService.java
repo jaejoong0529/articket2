@@ -2,6 +2,7 @@ package kjj.articket2.member.service;
 
 import kjj.articket2.global.jwt.CustomUserDetails;
 import kjj.articket2.member.domain.Member;
+import kjj.articket2.member.domain.Role;
 import kjj.articket2.member.dto.*;
 import kjj.articket2.member.exception.AuthenticationException;
 import kjj.articket2.member.exception.InvalidPasswordException;
@@ -60,11 +61,7 @@ public class MemberService {
     //돈 충전하기
     @Transactional
     public void rechargeMoney(MoneyRechargeRequest request, CustomUserDetails userDetails) {
-        if (userDetails == null) {
-            throw new AuthenticationException("허용되지 않은 접근입니다");
-        }
-        Member member = memberRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new MemberNotFoundException("일치하는 정보가 없습니다."));
+        Member member = getAuthenticatedMember(userDetails);
         member.addMoney(request.getAmount());
     }
 
@@ -75,5 +72,14 @@ public class MemberService {
         message.setSubject(subject);
         message.setText(text);
         javaMailSender.send(message);
+    }
+
+    //권환 확인
+    private Member getAuthenticatedMember(CustomUserDetails userDetails){
+        if (userDetails == null) {
+            throw new AuthenticationException("허용되지 않은 접근입니다");
+        }
+        return memberRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new MemberNotFoundException("일치하는 정보가 없습니다."));
     }
 }
