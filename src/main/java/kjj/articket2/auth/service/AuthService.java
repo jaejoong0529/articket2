@@ -62,7 +62,7 @@ public class AuthService {
         member.setLastLogin(LocalDateTime.now());
         memberRepository.save(member);
         String role = member.getRole().name();
-        String accessToken = jwtUtil.generateAccessToken(request.getUsername(),role);
+        String accessToken = jwtUtil.generateAccessToken(request.getUsername(), role);
         String refreshToken = jwtUtil.generateRefreshToken(request.getUsername());
         refreshTokenRepository.save(new RefreshToken(request.getUsername(), refreshToken));
         response.setHeader("Authorization", "Bearer " + accessToken);
@@ -91,20 +91,36 @@ public class AuthService {
         return (token != null && token.startsWith("Bearer ")) ? token.substring(7) : null;
     }
 
-    //리프레시토큰
+    // 리프레시 토큰 재발급
     public Map<String, String> refreshToken(String refreshToken) {
         if (refreshToken == null) {
-            throw new InvalidTokenException("유효하지않은 토큰입니다");
+            throw new InvalidTokenException("유효하지않은 토큰입니다1");
         }
-        RefreshToken storedToken = refreshTokenRepository.findByToken(refreshToken)
-                .orElseThrow(() -> new InvalidTokenException("유효하지않은 토큰입니다"));
 
-        if (!jwtUtil.validateToken(storedToken.getToken())) {
-            throw new InvalidTokenException("유효하지않은 토큰입니다");
+        // 1. 토큰에서 username 추출
+        String username = jwtUtil.getUsernameFromToken(refreshToken);
+        if (username == null) {
+            throw new InvalidTokenException("유효하지않은 토큰입니다2");
         }
-        String username = storedToken.getUsername();
+
+        // 2. username 기반으로 저장된 토큰 조회
+        RefreshToken storedToken = refreshTokenRepository.findById(username)
+                .orElseThrow(() -> new InvalidTokenException("유효하지않은 토큰입니다3"));
+
+        // 3. 저장된 토큰과 비교
+        if (!storedToken.getToken().equals(refreshToken)) {
+            throw new InvalidTokenException("유효하지않은 토큰입니다4");
+        }
+
+        // 4. 토큰 유효성 검사
+        if (!jwtUtil.validateToken(refreshToken)) {
+            throw new InvalidTokenException("유효하지않은 토큰입니다5");
+        }
+
+        // 5. 역할 가져오고, 새 accessToken 생성
         String role = jwtUtil.getRoleFromToken(refreshToken);
-        String newAccessToken = jwtUtil.generateAccessToken(username,role);
+        String newAccessToken = jwtUtil.generateAccessToken(username, role);
+
         return Map.of("accessToken", newAccessToken);
     }
 }
