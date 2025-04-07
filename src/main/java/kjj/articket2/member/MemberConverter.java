@@ -13,7 +13,6 @@ public  class MemberConverter {
 
     public static Member fromDto(MemberSignUpRequest request, PasswordEncoder passwordEncoder) {//dto->entity
         return Member.builder()
-                .id(request.getId())
                 .name(request.getName())
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))

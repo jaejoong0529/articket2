@@ -32,7 +32,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = extractToken(request);//토큰추출
+        String token = jwtUtil.extractToken(request);
+
 
         if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
@@ -58,11 +59,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        chain.doFilter(request, response); //
-    }
-
-    private String extractToken(HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
-        return (token != null && token.startsWith("Bearer ")) ? token.substring(7) : null;
+        chain.doFilter(request, response);
     }
 }

@@ -3,6 +3,7 @@ package kjj.articket2.global.jwt;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -72,6 +73,10 @@ public class JwtUtil {
         } catch (JwtException e) {
             return false;
         }
+    }
+    public String extractToken(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        return (token != null && token.startsWith("Bearer ")) ? token.substring(7) : null;
     }
 }
 

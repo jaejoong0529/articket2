@@ -1,18 +1,14 @@
 package kjj.articket2.auth.controller;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import kjj.articket2.auth.dto.MemberLoginRequest;
-import kjj.articket2.auth.dto.MemberLoginResponse;
-import kjj.articket2.auth.dto.MemberSignUpRequest;
+import jakarta.validation.Valid;
+import kjj.articket2.auth.dto.*;
 import kjj.articket2.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -20,29 +16,31 @@ import java.util.Map;
 @CrossOrigin(origins = "http://localhost:3000")
 public class AuthController {
     private final AuthService authService;
+    //회원가입
     @PostMapping("/signup")
-    public ResponseEntity<String> signUp(@RequestBody MemberSignUpRequest request) {
+    public ResponseEntity<String> signUp(@Valid @RequestBody MemberSignUpRequest request) {
         authService.signup(request);
         return ResponseEntity.status(HttpStatus.CREATED).body("회원가입 완료");
     }
 
+    //로그인
     @PostMapping("/login")
-    public ResponseEntity<MemberLoginResponse> login(@RequestBody MemberLoginRequest request, HttpServletResponse response1) {
-        MemberLoginResponse response = authService.login(request, response1);
+    public ResponseEntity<MemberLoginResponse> login(@Valid @RequestBody MemberLoginRequest request) {
+        MemberLoginResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }
 
+    //로그아웃
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request) {
         authService.logout(request);
         return ResponseEntity.ok("로그아웃 성공");
     }
+
+    //리프레시
     @PostMapping("/refresh")
-    public ResponseEntity<Map<String, String>> refreshToken(@RequestBody Map<String, String> request) {
-        String refreshToken = request.get("refreshToken");
-        Map<String, String> response = authService.refreshToken(refreshToken);
+    public ResponseEntity<TokenResponse> refreshToken(@Valid @RequestBody TokenRequest request) {
+        TokenResponse response = authService.refreshToken(request);
         return ResponseEntity.ok(response);
     }
 }
-
-
