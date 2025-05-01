@@ -1,4 +1,4 @@
-package kjj.articket2.member.controller;
+package kjj.articket2.admin.controller;
 
 import kjj.articket2.global.jwt.CustomUserDetails;
 import kjj.articket2.member.service.MemberService;

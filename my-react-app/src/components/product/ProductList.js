@@ -74,6 +74,9 @@ function ProductList() {
             <Link to="/recharge">
                 <button>돈 충전</button>
             </Link>
+            <Link to="/myinfo">
+                <button>내 정보</button>
+            </Link>
             <div>
                 {categories.map((category) => (
                     <button key={category} onClick={() => fetchProducts(category === "전체" ? null : category)}>
