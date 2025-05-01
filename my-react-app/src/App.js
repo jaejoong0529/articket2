@@ -18,6 +18,8 @@ import BidProduct from './components/bid/BidProduct';
 import HighestBid from './components/bid/HighestBid';
 import UserBids from './components/bid/UserBids';
 import BuyProduct from './components/bid/BuyProduct';
+import MyInfo from './components/transaction/MyInfo';
+import AdminHome from './components/admin/AdminHome';
 
 function App() {
     return (
@@ -41,6 +43,8 @@ function App() {
                 <Route path="/highestBid/:productId" element={<HighestBid />} />
                 <Route path="/userBids/:memberId" element={<UserBids />} />
                 <Route path="/buy/:productId" element={<BuyProduct />} />
+                <Route path="/myinfo" element={<MyInfo />} />
+                <Route path="/admin" element={<AdminHome />} />
             </Routes>
         </Router>
     );
