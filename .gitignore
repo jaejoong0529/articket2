@@ -19,7 +19,6 @@ bin/
 
 #민감정보
 src/main/resources/application.properties
-src/main/resources/data.sql
 ### IntelliJ IDEA ###
 .idea
 *.iws
