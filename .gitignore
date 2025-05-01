@@ -17,6 +17,8 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
+#민감정보
+src/main/resources/application.properties
 ### IntelliJ IDEA ###
 .idea
 *.iws
