@@ -37,4 +37,19 @@ public class AdminController {
     public ResponseEntity<List<AdminTransactionResponseDto>> getTransactions() {
         return ResponseEntity.ok(adminService.getAllTransactions());
     }
+    @DeleteMapping("/members/{id}")
+    public ResponseEntity<Void> deleteMember(@PathVariable Long id) {
+        adminService.deleteMember(id);
+        return ResponseEntity.noContent().build();
+    }
+    @DeleteMapping("/products/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        adminService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
+    }
+    @DeleteMapping("/transactions/{id}")
+    public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) {
+        adminService.deleteTransaction(id);
+        return ResponseEntity.noContent().build();
+    }
 }

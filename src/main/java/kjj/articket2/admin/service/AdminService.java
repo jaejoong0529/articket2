@@ -43,4 +43,15 @@ public class AdminService {
                 .map(AdminConverter::toProductDto)
                 .collect(Collectors.toList());
     }
+    public void deleteMember(Long memberId) {
+        memberRepository.deleteById(memberId);
+    }
+
+    public void deleteProduct(Long productId) {
+        productRepository.deleteById(productId);
+    }
+
+    public void deleteTransaction(Long transactionId) {
+        transactionRepository.deleteById(transactionId);
+    }
 }
