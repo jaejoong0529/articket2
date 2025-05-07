@@ -20,6 +20,9 @@ import UserBids from './components/bid/UserBids';
 import BuyProduct from './components/bid/BuyProduct';
 import MyInfo from './components/transaction/MyInfo';
 import AdminHome from './components/admin/AdminHome';
+import AdminMemberList from './components/admin/AdminMemberList';
+import AdminProductList from './components/admin/AdminProductList';
+import AdminTransactionList from './components/admin/AdminTransactionList';
 
 function App() {
     return (
@@ -45,6 +48,9 @@ function App() {
                 <Route path="/buy/:productId" element={<BuyProduct />} />
                 <Route path="/myinfo" element={<MyInfo />} />
                 <Route path="/admin" element={<AdminHome />} />
+                <Route path="/admin/users" element={<AdminMemberList />} />
+                <Route path="/admin/products" element={<AdminProductList />} />
+                <Route path="/admin/transactions" element={<AdminTransactionList />} />
             </Routes>
         </Router>
     );

@@ -1,0 +1,30 @@
+.admin-container {
+    padding: 20px;
+}
+
+.admin-container h2 {
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background-color: #f4f4f4;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+button {
+    padding: 5px 10px;
+    background-color: crimson;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
