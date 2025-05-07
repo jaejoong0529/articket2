@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { bidProduct, getHighestBid } from './bidService';
+import '../../css/Home.css';
+import '../../css/Bid.css';
 
 function BidProduct() {
     const { productId } = useParams();
@@ -38,20 +40,33 @@ function BidProduct() {
     };
 
     return (
-        <div>
-            <h2>상품 입찰</h2>
-            <p>
-                {highestBid === 0 ? '현재 입찰가가 없습니다.' : `현재 최고 입찰가: ${highestBid}원`}
-            </p>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="number"
-                    placeholder="입찰 금액"
-                    value={bidAmount}
-                    onChange={(e) => setBidAmount(e.target.value)}
-                />
-                <button type="submit">입찰</button>
-            </form>
+        <div className="home-container">
+            <header className="home-header">
+                <div className="logo" onClick={() => navigate('/products')}>
+                    Articket
+                </div>
+            </header>
+            <div className="bid-container">
+                <h2>상품 입찰</h2>
+                <p>
+                    {highestBid === 0 ? '현재 입찰가가 없습니다.' : `현재 최고 입찰가: ${highestBid}원`}
+                </p>
+                <form onSubmit={handleSubmit}>
+                    <input
+                        type="number"
+                        placeholder="입찰 금액"
+                        value={bidAmount}
+                        onChange={(e) => setBidAmount(e.target.value)}
+                    />
+                    <button type="submit">입찰</button>
+                </form>
+            </div>
+            <div className="button-group">
+                <button onClick={() => navigate(-1)}>뒤로 가기</button>
+                <Link to={`/products/${productId}`}>
+                    <button>상세 정보</button>
+                </Link>
+            </div>
         </div>
     );
 }

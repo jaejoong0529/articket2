@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { buyProduct } from './bidService'; // buyProduct는 bidService에서 가져옴
 import { getProductDetail } from '../product/productService'; // getProductDetail은 productService에서 가져옴
+import '../../css/Home.css';
+import '../../css/Product.css';
 
 function BuyProduct() {
     const { productId } = useParams();
@@ -26,10 +28,25 @@ function BuyProduct() {
     };
 
     return (
-        <div>
-            <h2>즉시 구매</h2>
-            {product && <p>즉시 구매 가격: {product.buyNowPrice}원</p>}
-            <button onClick={handleBuy}>구매</button>
+        <div className="home-container">
+            <header className="home-header">
+                <div className="logo" onClick={() => navigate('/products')}>
+                    Articket
+                </div>
+            </header>
+            <div className="buy-container">
+                <h2>즉시 구매</h2>
+                {product && <p>즉시 구매 가격: {product.buyNowPrice}원</p>}
+                <button onClick={handleBuy}>구매</button>
+            </div>
+            <div className="button-group">
+                <button onClick={() => navigate(-1)}>뒤로 가기</button>
+                {product && (
+                    <Link to={`/products/${productId}`}>
+                        <button>상세 정보</button>
+                    </Link>
+                )}
+            </div>
         </div>
     );
 }
