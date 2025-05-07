@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { getAccessToken } from "./authService";
 import { useNavigate } from "react-router-dom"; // useNavigate 훅 import
+import '../../css/Home.css';
 
 function RechargeMoney() {
     const [amount, setAmount] = useState(""); // 문자열로 관리
@@ -20,7 +21,7 @@ function RechargeMoney() {
         const token = getAccessToken();
         const amountNumber = parseInt(amount.replace(/,/g, ''), 10); // 콤마 제거 후 숫자로 변환
         try {
-            const response = await axios.post(
+            await axios.post(
                 "http://localhost:8080/recharge",
                 { amount: amountNumber },
                 {
@@ -31,23 +32,34 @@ function RechargeMoney() {
                 }
             );
             alert("돈 충전이 완료되었습니다.");
-            navigate("/products"); // 상품 목록 페이지로 이동
+            navigate("/products");
         } catch (error) {
             console.error("Error recharging money:", error);
             alert("돈 충전에 실패했습니다.");
         }
     };
 
+
     return (
-        <div>
-            <h2>돈 충전</h2>
-            <input
-                type="text" // 숫자 포맷팅을 위해 type을 text로 변경
-                placeholder="충전할 금액"
-                value={amount}
-                onChange={handleAmountChange} // 입력 값 변경 시 포맷팅 적용
-            />
-            <button onClick={handleRecharge}>충전</button>
+        <div className="home-container">
+            <header className="home-header">
+                <div className="logo" onClick={() => navigate('/products')}>Articket</div>
+            </header>
+
+            <main className="main-content">
+                <h1 className="main-title">💰 돈 충전</h1>
+                <input
+                    type="text"
+                    placeholder="충전할 금액 입력"
+                    value={amount}
+                    onChange={handleAmountChange}
+                    style={{padding: '10px', fontSize: '16px', marginBottom: '20px', width: '200px'}}
+                />
+                <div className="button-group">
+                    <button onClick={handleRecharge}>충전</button>
+                    <button onClick={() => navigate(-1)}>← 뒤로가기</button>
+                </div>
+            </main>
         </div>
     );
 }
