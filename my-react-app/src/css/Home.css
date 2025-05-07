@@ -1,0 +1,101 @@
+.home-container {
+    font-family: 'Arial', sans-serif;
+    padding: 0;
+    margin: 0;
+}
+
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    border-bottom: 1px solid #ddd;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: bold;
+    color: #ff6f0f;
+    cursor: pointer;
+}
+
+.download-btn {
+    background-color: #ff6f0f;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.main-content {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.main-title {
+    font-size: 28px;
+    margin-bottom: 30px;
+}
+
+.search-box {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.search-box input {
+    width: 300px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    outline: none;
+}
+
+.search-btn {
+    padding: 10px 20px;
+    border: none;
+    background-color: black;
+    color: white;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    cursor: pointer;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.button-group button {
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background-color: white;
+    color: black; /* 글씨색 검정으로 설정 */
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.button-group button:hover {
+    background-color: #f2f2f2;
+}
+
+.error-message {
+    color: red;
+    font-size: 16px;
+    padding: 10px;
+    border: 1px solid red;
+    border-radius: 6px;
+    background-color: #ffe6e6;
+}
+
+.loading-message {
+    font-size: 18px;
+    text-align: center;
+    color: #666;
+}
