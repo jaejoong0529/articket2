@@ -61,3 +61,17 @@ export const refreshToken = async (refreshTokenValue) => {
         throw error;
     }
 };
+export const fetchCurrentUser = async () => {
+    try {
+        const accessToken = getAccessToken();
+        const response = await axios.get("http://localhost:8080/api/me", {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        return response.data; // { username: "...", role: "ROLE_ADMIN" }
+    } catch (error) {
+        console.error("Fetch current user error:", error);
+        throw error;
+    }
+};
