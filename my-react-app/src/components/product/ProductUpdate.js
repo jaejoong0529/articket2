@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getProductDetail, updateProduct } from './productService';
+import '../../css/Home.css';
+import '../../css/Product.css';
 
 function ProductUpdate() {
     const { id } = useParams();
@@ -17,8 +19,8 @@ function ProductUpdate() {
             const productData = response.data;
             setProduct(productData);
             setProductName(productData.productName);
-            setPrice(productData.price.toString());
-            setBuyNowPrice(productData.buyNowPrice.toString());
+            setPrice(formatNumber(productData.price.toString()));
+            setBuyNowPrice(formatNumber(productData.buyNowPrice.toString()));
             setDescription(productData.description);
         });
     }, [id]);
@@ -29,11 +31,13 @@ function ProductUpdate() {
     };
 
     const handlePriceChange = (e) => {
-        setPrice(formatNumber(e.target.value));
+        setPrice(e.target.value);
+        // Optionally format while typing if desired: setPrice(formatNumber(e.target.value));
     };
 
     const handleBuyNowPriceChange = (e) => {
-        setBuyNowPrice(formatNumber(e.target.value));
+        setBuyNowPrice(e.target.value);
+        // Optionally format while typing if desired: setBuyNowPrice(formatNumber(e.target.value));
     };
 
     const handleSubmit = async (e) => {
@@ -51,19 +55,31 @@ function ProductUpdate() {
         }
     };
 
-    if(!product) return <div>loading...</div>
+    if (!product) return <div className="loading-message">Loading product details...</div>;
 
     return (
-        <div>
-            <h2>상품 수정</h2>
-            <form onSubmit={handleSubmit}>
-                <input type="text" placeholder="상품 이름" value={productName} onChange={(e) => setProductName(e.target.value)} />
-                <input type="text" placeholder="시작가" value={price} onChange={handlePriceChange} />
-                <input type="text" placeholder="즉시 구매가" value={buyNowPrice} onChange={handleBuyNowPriceChange} />
-                <textarea placeholder="상품 설명" value={description} onChange={(e) => setDescription(e.target.value)} />
-                <input type="file" onChange={(e) => setImage(e.target.files[0])} />
-                <button type="submit">수정</button>
-            </form>
+        <div className="home-container">
+            <header className="home-header">
+                <div className="logo" onClick={() => navigate('/products')}>
+                    Articket
+                </div>
+            </header>
+            <div className="product-update-container">
+                <h2>상품 수정</h2>
+                <form onSubmit={handleSubmit}>
+                    <input type="text" placeholder="상품 이름" value={productName}
+                           onChange={(e) => setProductName(e.target.value)}/>
+                    <input type="text" placeholder="시작가" value={price} onChange={handlePriceChange}/>
+                    <input type="text" placeholder="즉시 구매가" value={buyNowPrice} onChange={handleBuyNowPriceChange}/>
+                    <textarea placeholder="상품 설명" value={description} onChange={(e) => setDescription(e.target.value)}/>
+                    <input type="file" onChange={(e) => setImage(e.target.files[0])}/>
+                    <button type="submit">수정</button>
+                </form>
+                <div className="button-group">
+                    <button onClick={() => navigate(-1)}>뒤로 가기</button>
+                    {/* Add other header buttons if needed */}
+                </div>
+            </div>
         </div>
     );
 }

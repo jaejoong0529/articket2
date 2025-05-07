@@ -1,0 +1,166 @@
+.product-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+.product-item h3 {
+    font-size: 22px;
+    color: #333;
+    margin: 0;
+}
+
+.product-item p {
+    font-size: 16px;
+    color: #555;
+}
+
+.product-item img {
+    max-width: 100px;
+    height: auto;
+    border-radius: 8px;
+}
+
+.product-item button {
+    background-color: #ff6f0f;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.product-item button:hover {
+    background-color: #e65b00;
+}
+/* ProductUpdate.css */
+.product-update-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 30px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.product-update-container h2 {
+    color: #333;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.product-update-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.product-update-container input[type="text"],
+.product-update-container textarea,
+.product-update-container input[type="file"] {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1em;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.product-update-container input:focus,
+.product-update-container textarea:focus {
+    border-color: #ff6f0f;
+}
+
+.product-update-container textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.product-update-container button[type="submit"] {
+    background-color: #ff6f0f;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color 0.2s ease;
+}
+
+.product-update-container button[type="submit"]:hover {
+    background-color: #e65b00;
+}
+
+.product-update-container > div { /* Container for buttons */
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.product-update-container > div button {
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.product-update-container > div button:hover {
+    background-color: #f2f2f2;
+}
+/* ProductDelete.css */
+.delete-confirmation {
+    text-align: center;
+    padding: 30px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+.delete-confirmation h2 {
+    color: #d32f2f;
+    margin-bottom: 20px;
+}
+
+.delete-confirmation p {
+    font-size: 1.1em;
+    color: #555;
+    margin-bottom: 25px;
+}
+
+.delete-confirmation button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin: 0 10px;
+}
+
+.delete-confirmation button:first-child {
+    background-color: #d32f2f;
+    color: white;
+}
+
+.delete-confirmation button:first-child:hover {
+    background-color: #b71c1c;
+}
+
+.delete-confirmation button:last-child {
+    background-color: #f44336; /* A lighter red for cancel */
+    color: white;
+}
+
+.delete-confirmation button:last-child:hover {
+    background-color: #e53935;
+}

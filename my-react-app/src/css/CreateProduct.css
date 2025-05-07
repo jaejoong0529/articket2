@@ -1,0 +1,50 @@
+.center-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 300px;
+    margin: 0 auto;
+}
+
+.center-form input[type="text"],
+.center-form input[type="number"],
+.center-form textarea,
+.center-form select {
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.center-form input:focus,
+.center-form textarea:focus,
+.center-form select:focus {
+    border-color: #ff6f0f;
+}
+
+.center-form textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.center-form input[type="file"] {
+    border: none;
+    padding: 5px 0;
+}
+
+.center-form button[type="submit"] {
+    background-color: #ff6f0f;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.center-form button[type="submit"]:hover {
+    background-color: #e65b00;
+}

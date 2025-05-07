@@ -3,6 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { getProducts } from "./productService";
 import { getHighestBid } from "../bid/bidService"; // getHighestBid 추가
 import { logout } from "../member/authService";
+import '../../css/Product.css'; // 공통 CSS 파일 import
+import '../../css/Home.css'; // 공통 CSS 파일 import
+
 
 function ProductList() {
     const [products, setProducts] = useState([]);
@@ -65,19 +68,25 @@ function ProductList() {
     const categories = ["전체", "ELECTRONICS", "FASHION", "BOOKS", "SPORTS", "BEAUTY"];
 
     return (
-        <div>
-            <h1>상품 목록</h1>
-            <button onClick={handleLogout}>로그아웃</button>
-            <Link to="/products/create">
-                <button>상품 등록</button>
-            </Link>
-            <Link to="/recharge">
-                <button>돈 충전</button>
-            </Link>
-            <Link to="/myinfo">
-                <button>내 정보</button>
-            </Link>
-            <div>
+        <div className="home-container">
+            <header className="home-header">
+                <div className="logo" onClick={() => navigate('/products')}>
+                    Articket
+                </div>
+                <div className="button-group">
+                    <button onClick={handleLogout}>로그아웃</button>
+                    <Link to="/products/create">
+                        <button>상품 등록</button>
+                    </Link>
+                    <Link to="/recharge">
+                        <button>돈 충전</button>
+                    </Link>
+                    <Link to="/myinfo">
+                        <button>내 정보</button>
+                    </Link>
+                </div>
+            </header>
+            <div className="button-group">
                 {categories.map((category) => (
                     <button key={category} onClick={() => fetchProducts(category === "전체" ? null : category)}>
                         {category}
@@ -85,17 +94,18 @@ function ProductList() {
                 ))}
             </div>
             <ul>
-                {products.map((product) => (
-                    <li key={product.id}>
-                        <h3>{product.productName}</h3>
-                        <p>시작가: {product.price} 원</p>
-                        <p>즉시 구매가: {product.buyNowPrice} 원</p>
-                        <p>현재 최고 입찰가: {highestBids[product.id] || "입찰 없음"} 원</p> {/* 최고 입찰가 표시 */}
+            {products.map((product) => (
+                    <li key={product.id} className="product-item">
+                        <div>
+                            <h3>{product.productName}</h3>
+                            <p>시작가: {product.price} 원</p>
+                            <p>즉시 구매가: {product.buyNowPrice} 원</p>
+                            <p>현재 최고 입찰가: {highestBids[product.id] || "입찰 없음"} 원</p>
+                        </div>
                         {product.image && (
                             <img
                                 src={`http://localhost:8080${product.image}`}
                                 alt={product.productName}
-                                width="150"
                             />
                         )}
                         <Link to={`/products/${product.id}`}>
