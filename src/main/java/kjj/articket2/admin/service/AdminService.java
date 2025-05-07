@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 public class AdminService {
     private final MemberRepository memberRepository;
     private final TransactionRepository transactionRepository;
-    private final BidRepository bidRepository;
     private final ProductRepository productRepository;
     //회원 정보 관리
     public List<AdminMemberResponseDto> getAllMembers() {

@@ -12,6 +12,7 @@ public class AdminConverter {
     public static AdminMemberResponseDto toMemberDto(Member member) {
         return AdminMemberResponseDto.builder()
                 .memberId(member.getId())
+                .nickname(member.getNickname())
                 .username(member.getUsername())
                 .email(member.getEmail())
                 .role(String.valueOf(member.getRole()))
@@ -20,6 +21,7 @@ public class AdminConverter {
     public static AdminTransactionResponseDto toTransactionDto(Transaction tx) {
         return AdminTransactionResponseDto.builder()
                 .transactionId(tx.getId())
+                .productName(tx.getProduct().getProductName())
                 .buyer(tx.getBuyer().getUsername())
                 .seller(tx.getSeller().getUsername())
                 .price(tx.getPrice())
@@ -31,6 +33,7 @@ public class AdminConverter {
         return AdminProductResponseDto.builder()
                 .productId(product.getId())
                 .productName(product.getProductName())
+                .sellerUsername(product.getMember().getUsername())
                 .price(product.getPrice())
                 .buyNowPrice(product.getBuyNowPrice())
                 .image(product.getImage()) // 이미지 URL 설정

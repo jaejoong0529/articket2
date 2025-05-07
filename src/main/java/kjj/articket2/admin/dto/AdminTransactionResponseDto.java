@@ -6,6 +6,7 @@ import lombok.*;
 @NoArgsConstructor
 public class AdminTransactionResponseDto {
     private Long transactionId;
+    private String productName;
     private String buyer;
     private String seller;
     private int price;

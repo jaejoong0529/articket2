@@ -27,7 +27,7 @@ public class AuctionScheduler {
     private final MemberRepository memberRepository;
     private final TransactionRepository transactionRepository;
 
-    @Scheduled(fixedRate = 60000) // 1분마다 실행 (실제 운영에서는 1시간 or 10분마다 실행 추천)
+    @Scheduled(fixedRate = 600000) // 1분마다 실행 (실제 운영에서는 1시간 or 10분마다 실행 추천)
     @Transactional
     public void closeExpiredBids() {
         log.info("📢 경매 마감 스케줄러 실행 중...");

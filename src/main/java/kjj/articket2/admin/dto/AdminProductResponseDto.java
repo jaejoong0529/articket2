@@ -7,6 +7,7 @@ import lombok.*;
 public class AdminProductResponseDto {
     private Long productId;
     private String productName;
+    private String sellerUsername;
     private Integer price;
     private Integer buyNowPrice;
     private String image;
