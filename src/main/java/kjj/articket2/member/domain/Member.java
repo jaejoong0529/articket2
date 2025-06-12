@@ -6,10 +6,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Entity
-@Getter @Setter
+@Getter
 @Builder(toBuilder = true)
-@NoArgsConstructor//기본생성자
-@AllArgsConstructor//모든 필드 포함 생성자
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,32 +23,26 @@ public class Member {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
-    @Builder.Default
-    private int money = 0;
-    @Builder.Default
-    private LocalDateTime dateJoined = LocalDateTime.now();
-    @Builder.Default
-    private LocalDateTime lastLogin = LocalDateTime.now();
+    private int money;
+    private LocalDateTime dateJoined;
+    private LocalDateTime lastLogin;
 
-
-    /**
-     *회원가입 날짜
-     */
-    public String dateJoinedFormatted() {
-        return formatted(dateJoined);
+    @PrePersist
+    public void initDates() {
+        this.dateJoined = this.dateJoined == null ? LocalDateTime.now() : this.dateJoined;
+        this.lastLogin = this.lastLogin == null ? LocalDateTime.now() : this.lastLogin;
     }
 
-    /**
-     *마지막 로그인
-     */
-    public String lastLoginFormatted() {
-        return formatted(lastLogin);
+    public String getDateJoinedFormatted() {
+        return format(dateJoined);
     }
 
+    public String getLastLoginFormatted() {
+        return format(lastLogin);
+    }
 
-    private String formatted(LocalDateTime dateTime) {//LocalDateTime 객체를 받아서 지정된 형식으로 문자열을 반환
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return dateTime.format(formatter);
+    private String format(LocalDateTime time) {
+        return time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
     public void deductMoney(Integer amount) {
@@ -63,5 +57,9 @@ public class Member {
             throw new IllegalArgumentException("충전 금액은 0보다 커야 합니다.");
         }
         this.money += amount;
+    }
+
+    public void updatePassword(String encodedPassword) {
+        this.password = encodedPassword;
     }
 }
