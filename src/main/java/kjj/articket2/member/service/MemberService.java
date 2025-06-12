@@ -32,30 +32,24 @@ public class MemberService {
     }
 
     //비밀번호찾기
+    @Transactional
     public void findPassword(MemberFindPasswordRequest request) {
         Member member = memberRepository.findByUsernameAndEmail(request.getUsername(), request.getEmail())
                 .orElseThrow(() -> new MemberNotFoundException("일치하는 정보가 없습니다."));
         String tempPassword = generateTempPassword();
-        member.setPassword(passwordEncoder.encode(tempPassword));
-        memberRepository.save(member);
+        member.updatePassword(passwordEncoder.encode(tempPassword));
         sendEmail(request.getEmail(), "비밀번호 찾기 결과", "회원님의 임시 비밀번호는 " + tempPassword + "입니다.\n로그인 후 비밀번호를 변경해주세요.");
     }
 
-    //임시 비밀번호 생성
-    private String generateTempPassword() {
-        return UUID.randomUUID().toString().substring(0, 8); // 8자리 랜덤 문자열 생성
-    }
-
-
     //비밀번호 변경
+    @Transactional
     public void changePassword(MemberChangePasswordRequest request) {
         Member member = memberRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new MemberNotFoundException("일치하는 정보가 없습니다."));
         if (!passwordEncoder.matches(request.getCurrentPassword(), member.getPassword())) {
             throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
         }
-        member.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        memberRepository.save(member);
+        member.updatePassword(passwordEncoder.encode(request.getNewPassword()));
     }
 
     //돈 충전하기
@@ -67,11 +61,11 @@ public class MemberService {
 
     //이메일 전송
     private void sendEmail(String to, String subject, String text) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(text);
-        javaMailSender.send(message);
+        SimpleMailMessage mail = new SimpleMailMessage();
+        mail.setTo(to);
+        mail.setSubject(subject);
+        mail.setText(text);
+        javaMailSender.send(mail);
     }
 
     //권환 확인
@@ -81,5 +75,10 @@ public class MemberService {
         }
         return memberRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new MemberNotFoundException("일치하는 정보가 없습니다."));
+    }
+
+    //임시 비밀번호 생성
+    private String generateTempPassword() {
+        return UUID.randomUUID().toString().substring(0, 8); // 8자리 랜덤 문자열 생성
     }
 }
