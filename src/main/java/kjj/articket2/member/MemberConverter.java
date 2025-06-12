@@ -2,11 +2,12 @@ package kjj.articket2.member;
 
 import kjj.articket2.auth.dto.MemberLoginResponse;
 import kjj.articket2.auth.dto.MemberSignUpRequest;
+import kjj.articket2.global.jwt.CustomUserDetails;
 import kjj.articket2.member.domain.Member;
+import kjj.articket2.member.domain.Role;
+import kjj.articket2.member.dto.MemberDto;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 
 @Component
 public  class MemberConverter {
@@ -19,9 +20,7 @@ public  class MemberConverter {
                 .nickname(request.getNickname())
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
-                .money(0) // 기본값 설정
-                .dateJoined(LocalDateTime.now()) // 기본값 설정
-                .lastLogin(LocalDateTime.now()) // 기본값 설정
+                .role(Role.ROLE_USER)
                 .build();
     }
 
@@ -30,6 +29,17 @@ public  class MemberConverter {
                 .message("로그인 성공")
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .build();
+    }
+
+    public MemberDto toDto(CustomUserDetails userDetails) {
+        String role = userDetails.getAuthorities().stream()
+                .findFirst()
+                .map(auth ->auth.getAuthority())
+                .orElse("ROLE_USER");
+        return MemberDto.builder()
+                .username(userDetails.getUsername())
+                .role(role)
                 .build();
     }
 }
