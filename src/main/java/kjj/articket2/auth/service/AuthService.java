@@ -24,10 +24,8 @@ import java.time.LocalDateTime;
 
 import static kjj.articket2.global.jwt.TokenValidator.INVALID_TOKEN;
 
-
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class AuthService {
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -35,8 +33,8 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final TokenValidator tokenValidator;
 
-
     //회원가입
+    @Transactional
     public void signup(MemberSignUpRequest request) {
         validateDuplicateUser(request);
         Member member = MemberConverter.fromDto(request, passwordEncoder);
@@ -44,12 +42,12 @@ public class AuthService {
     }
 
     //로그인
+    @Transactional(readOnly = true)
     public MemberLoginResponse login(MemberLoginRequest request) {
         Member member = memberRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new MemberNotFoundException("일치하는 정보가 없습니다."));
         passwordMatches(request.getPassword(), member.getPassword());
-        member.setLastLogin(LocalDateTime.now());
-        memberRepository.save(member);
+        member.updateLastLogin(LocalDateTime.now());
         String role = member.getRole().name();
         String accessToken = jwtUtil.generateAccessToken(request.getUsername(),role);
         String refreshToken = jwtUtil.generateRefreshToken(request.getUsername());
@@ -57,6 +55,7 @@ public class AuthService {
         return MemberConverter.toLoginResponse(accessToken, refreshToken);
     }
 
+    @Transactional
     //로그아웃
     public void logout(HttpServletRequest request) {
         String token = jwtUtil.extractToken(request);
@@ -66,21 +65,22 @@ public class AuthService {
         SecurityContextHolder.clearContext();
     }
 
-    //리프레시
+    @Transactional
     public TokenResponse refreshToken(TokenRequest request) {
-        String refreshToken = request.getRefreshToken();
-        // 토큰 유효성 검사
-        validateRefreshToken(refreshToken);
+        String oldRefreshToken = request.getRefreshToken();
+        validateRefreshToken(oldRefreshToken);
 
-        String username = jwtUtil.getUsernameFromToken(refreshToken);
+        String username = jwtUtil.getUsernameFromToken(oldRefreshToken);
         RefreshToken storedToken = getStoredToken(username);
-        // 요청으로 온 토큰과 DB에 저장된 토큰이 일치하는지 확인
-        validateStoredToken(refreshToken, storedToken);
+        validateStoredToken(oldRefreshToken, storedToken);
 
-        String role = jwtUtil.getRoleFromToken(refreshToken);
+        String role = jwtUtil.getRoleFromToken(oldRefreshToken);
         String newAccessToken = jwtUtil.generateAccessToken(username, role);
+        String newRefreshToken = jwtUtil.generateRefreshToken(username);
 
-        return new TokenResponse(newAccessToken);
+        refreshTokenRepository.save(new RefreshToken(username, newRefreshToken));
+
+        return new TokenResponse(newAccessToken, newRefreshToken);
     }
 
     private void validateRefreshToken(String refreshToken) {
