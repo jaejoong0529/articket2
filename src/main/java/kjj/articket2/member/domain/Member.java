@@ -3,7 +3,6 @@ package kjj.articket2.member.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Entity
 @Getter
@@ -30,19 +29,6 @@ public class Member {
     @PrePersist
     public void initDates() {
         this.dateJoined = this.dateJoined == null ? LocalDateTime.now() : this.dateJoined;
-        this.lastLogin = this.lastLogin == null ? LocalDateTime.now() : this.lastLogin;
-    }
-
-    public String getDateJoinedFormatted() {
-        return format(dateJoined);
-    }
-
-    public String getLastLoginFormatted() {
-        return format(lastLogin);
-    }
-
-    private String format(LocalDateTime time) {
-        return time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
     public void deductMoney(Integer amount) {
@@ -61,5 +47,9 @@ public class Member {
 
     public void updatePassword(String encodedPassword) {
         this.password = encodedPassword;
+    }
+
+    public void updateLastLogin(LocalDateTime now) {
+        this.lastLogin = now;
     }
 }
