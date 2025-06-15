@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/signup", "/auth/login","/findUsername","/findPassword","/auth/refresh").permitAll()//모든사용자 허용
+                        .requestMatchers("/api/auth/signup", "/api/auth/login","/api/members/findUsername","/api/members/findPassword","/api/auth/refresh").permitAll()//모든사용자 허용
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()

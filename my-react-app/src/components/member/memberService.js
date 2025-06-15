@@ -1,6 +1,6 @@
 // components/member/memberService.js
 
-const API_BASE_URL = "http://localhost:8080/"; // members API 기본 URL 설정
+const API_BASE_URL = "http://localhost:8080/api/members"; // members API 기본 URL 설정
 
 const handleResponse = async (response) => {
     if (!response.ok) {

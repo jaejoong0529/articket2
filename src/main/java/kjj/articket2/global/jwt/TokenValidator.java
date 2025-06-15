@@ -5,15 +5,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TokenValidator {
-
     public static final String INVALID_TOKEN = "유효하지 않은 토큰입니다.";
-
     private final JwtUtil jwtUtil;
 
     public TokenValidator(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
     }
-
     public void validateTokenExists(String token) {
         if (token == null || token.isBlank()) {
             throw new InvalidTokenException(INVALID_TOKEN);

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = "http://localhost:8080/auth";
+const API_BASE_URL = "http://localhost:8080/api/auth";
 
 const storeTokens = (tokens) => {
     localStorage.setItem("accessToken", tokens.accessToken);
