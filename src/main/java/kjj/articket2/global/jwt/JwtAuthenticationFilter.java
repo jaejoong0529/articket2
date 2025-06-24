@@ -39,10 +39,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 if (jwtUtil.validateToken(token)) {  // 유효한 토큰인지 확인
                     String username = jwtUtil.getUsernameFromToken(token);
-                    String role = jwtUtil.getRoleFromToken(token);  // ✅ 역할(Role) 가져오기
+                    String role = jwtUtil.getRoleFromToken(token);  //역할(Role) 가져오기
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                    // ✅ 역할 기반으로 권한 부여
+                    //역할 기반으로 권한 부여
                     List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
 
                     UsernamePasswordAuthenticationToken authentication =
@@ -55,10 +55,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
                 response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
-                return; // 🚀 잘못된 토큰이면 요청 중단
+                return; //잘못된 토큰이면 요청 중단
             }
         }
-
         chain.doFilter(request, response);
     }
 }

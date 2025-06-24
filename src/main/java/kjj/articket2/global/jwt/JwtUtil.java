@@ -35,7 +35,7 @@ public class JwtUtil {
                 .claim("role", role) // 역할 그대로 저장
                 .setIssuedAt(new Date())//발행시간
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiration))//만료시간
-                .signWith(SignatureAlgorithm.HS256, key)//토큰서명
+                .signWith(key,SignatureAlgorithm.HS256)//토큰서명
                 .compact();//문자열로 압축
 
     }
@@ -47,7 +47,7 @@ public class JwtUtil {
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
-                .signWith(SignatureAlgorithm.HS256, key)
+                .signWith(key,SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -58,7 +58,7 @@ public class JwtUtil {
                 .getBody()
                 .getSubject();
     }
-    // 🔹 JWT에서 역할(Role) 추출
+    //JWT에서 역할(Role) 추출
     public String getRoleFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build()
                 .parseClaimsJws(token)
@@ -79,4 +79,3 @@ public class JwtUtil {
         return (token != null && token.startsWith("Bearer ")) ? token.substring(7) : null;
     }
 }
-
