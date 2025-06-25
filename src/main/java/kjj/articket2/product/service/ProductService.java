@@ -12,6 +12,7 @@ import kjj.articket2.product.dto.ProductCreateRequest;
 import kjj.articket2.product.dto.ProductDetailResponse;
 import kjj.articket2.product.dto.ProductResponse;
 import kjj.articket2.product.dto.ProductUpdateRequest;
+import kjj.articket2.product.exception.FileStorageException;
 import kjj.articket2.product.exception.ProductNotFoundException;
 import kjj.articket2.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,21 +25,22 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ProductService {
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
     private final FileService fileService;
 
     //상품등록
+    @Transactional
     public void createProduct(ProductCreateRequest request, MultipartFile image, CustomUserDetails userDetails) {
         Member member = getAuthenticatedMember(userDetails);
-        String imageUrl = (image != null && !image.isEmpty()) ? fileService.saveFile(image) : null;
+        String imageUrl = saveFileOrNull(image);
         Product product = ProductConverter.fromDto(request, member, imageUrl);
         productRepository.save(product);
     }
 
     //상품 목록 조회
+    @Transactional(readOnly = true)
     public List<ProductResponse> getAllProducts() {
         return productRepository.findAll().stream()
                 .map(ProductConverter::fromEntity)
@@ -46,6 +48,7 @@ public class ProductService {
     }
 
     //카테고리별 상품 목록 조회
+    @Transactional(readOnly = true)
     public List<ProductResponse> getProductsByCategory(Category category) {
         List<Product> products = productRepository.findByCategory(category);
         return products.stream()
@@ -54,12 +57,14 @@ public class ProductService {
     }
 
     //상품 상세 조회
+    @Transactional(readOnly = true)
     public ProductDetailResponse getProductById(Long productId) {
         Product product = findProductById(productId);
         return ProductConverter.fromDetailEntity(product);
     }
 
     //상품 삭제 (판매자만 가능)
+    @Transactional
     public void deleteProduct(Long productId, CustomUserDetails userDetails) {
         Member member = getAuthenticatedMember(userDetails);
         Product product = findProductById(productId);
@@ -68,13 +73,29 @@ public class ProductService {
     }
 
     //상품 수정 (판매자만 가능)
+    @Transactional
     public void updateProduct(Long productId, ProductUpdateRequest request,MultipartFile image, CustomUserDetails userDetails) {
         Member member = getAuthenticatedMember(userDetails);
         Product product = findProductById(productId);
         validateProductOwnership(product, member);
-        String imageUrl = (image != null && !image.isEmpty()) ? fileService.saveFile(image) : product.getImage();
-        Product updatedProduct = ProductConverter.fromUpdateDto(request, product, imageUrl);
-        productRepository.save(updatedProduct);
+        String imageUrl = product.getImage();
+        String newImageUrl = saveFileOrNull(image);
+        if (newImageUrl != null) {
+            imageUrl = newImageUrl;
+        }
+        ProductConverter.updateEntity(product, request, imageUrl);
+    }
+
+    //파일이 없으면 null, 있으면 저장 후 URL 반환
+    private String saveFileOrNull(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
+        try {
+            return fileService.saveFile(file);
+        } catch (FileStorageException ex) {
+            throw ex;
+        }
     }
 
     //권환 확인
@@ -88,15 +109,14 @@ public class ProductService {
 
     //상품찾기
     private Product findProductById(Long productId) {
-        return productRepository.findByIdWithLock(productId)
+        return productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("해당 상품을 찾을 수 없습니다."));
     }
 
     //판매자 권환
     private void validateProductOwnership(Product product, Member member) {
-        if (!product.getMember().equals(member)) {
+        if (!product.getMember().getId().equals(member.getId())) {
             throw new AuthenticationException("권한이 없습니다.");
         }
     }
 }
-

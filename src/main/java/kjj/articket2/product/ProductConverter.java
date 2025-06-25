@@ -47,14 +47,14 @@ public class ProductConverter {
                 .image(product.getImage()) // 이미지 URL 설정
                 .build();
     }
-    public static Product fromUpdateDto(ProductUpdateRequest request, Product product, String imageUrl) {
-        return product.toBuilder()
-                .productName(request.getProductName())
-                .description(request.getDescription())
-                .price(request.getPrice())
-                .image(imageUrl)
-                .build();
+    public static void updateEntity(Product product, ProductUpdateRequest request, String imageUrl) {
+        product.update(
+                request.getProductName(),
+                request.getDescription(),
+                request.getPrice(),
+                request.getBuyNowPrice(),
+                imageUrl,
+                request.getCategory()
+        );
     }
 }
-
-

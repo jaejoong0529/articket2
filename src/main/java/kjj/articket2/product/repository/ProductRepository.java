@@ -14,9 +14,8 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findAllByEndTimeBeforeAndIsSoldFalse(LocalDateTime now);
-    @Lock(LockModeType.PESSIMISTIC_WRITE) // ✅ 상품 데이터를 잠금
-    @Query("SELECT p FROM Product p WHERE p.id = :id")
-    Optional<Product> findByIdWithLock(@Param("id") Long id);
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<Product> findById(Long id);
 
     List<Product> findByCategory(Category category);
 }

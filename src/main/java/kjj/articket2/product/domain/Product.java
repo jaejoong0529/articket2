@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
 @Builder(toBuilder = true)
 @NoArgsConstructor//기본생성자
 @AllArgsConstructor//모든 필드 포함 생성자
@@ -34,4 +33,12 @@ public class Product {
         this.isSold = true;
     }
 
+    public void update(String productName, String description, Integer price, Integer buyNowPrice, String image, Category category) {
+        this.productName = productName;
+        this.description = description;
+        this.price = price;
+        this.buyNowPrice = buyNowPrice;
+        this.image = image;
+        this.category = category;
+    }
 }
