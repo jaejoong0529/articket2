@@ -87,7 +87,7 @@ public class BidService {
 
     //상품찾기
     private Product findProductById(Long productId) {
-        return productRepository.findByIdWithLock(productId)
+        return productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("해당 상품을 찾을 수 없습니다."));
     }
 
