@@ -42,7 +42,7 @@ public class AuthService {
     }
 
     //로그인
-    @Transactional(readOnly = true)
+    @Transactional
     public MemberLoginResponse login(MemberLoginRequest request) {
         Member member = memberRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new MemberNotFoundException("일치하는 정보가 없습니다."));
