@@ -9,8 +9,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
-@Builder(toBuilder = true)
+@Builder
 @NoArgsConstructor//기본생성자
 @AllArgsConstructor//모든 필드 포함 생성자
 public class Bid {
