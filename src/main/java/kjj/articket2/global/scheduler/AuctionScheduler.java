@@ -6,6 +6,7 @@ import kjj.articket2.member.domain.Member;
 import kjj.articket2.member.repository.MemberRepository;
 import kjj.articket2.product.domain.Product;
 import kjj.articket2.product.repository.ProductRepository;
+import kjj.articket2.transaction.TransactionConverter;
 import kjj.articket2.transaction.domain.Transaction;
 import kjj.articket2.transaction.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,7 @@ public class AuctionScheduler {
         List<Product> expiredProducts = productRepository.findAllByEndTimeBeforeAndIsSoldFalse(LocalDateTime.now());
 
         for (Product product : expiredProducts) {
-            Optional<Bid> highestBid = bidRepository.findTopByProductIdOrderByBidAmountDesc(product.getId());
+            Optional<Bid> highestBid = bidRepository.findTopByProductIdOrderByBidAmountDescWithLock(product.getId());
 
             if (highestBid.isPresent()) {
                 // 최고 입찰자가 존재하면 최종 입찰자로 낙찰 처리
@@ -44,11 +45,8 @@ public class AuctionScheduler {
                 Member winner = winningBid.getMember();
                 Member seller = product.getMember();
 
-                // 구매자의 잔액 차감
-                winner.deductMoney(winningBid.getBidAmount());
-                memberRepository.save(winner);
-                // 🆕 거래 내역 저장
-                Transaction trade = Transaction.createTrade(winner, seller, product, winningBid.getBidAmount());
+                // 거래 내역 저장
+                Transaction trade = TransactionConverter.createTrade(winner, seller, product, winningBid.getBidAmount());
                 transactionRepository.save(trade);
 
                 log.info("🎉 상품 {}이(가) {}님에게 {}원에 낙찰됨!", product.getId(), winner.getUsername(), winningBid.getBidAmount());
@@ -62,4 +60,3 @@ public class AuctionScheduler {
         }
     }
 }
-
