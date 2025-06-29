@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +26,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class BidService {
     private final BidRepository bidRepository;
     private final ProductRepository productRepository;
@@ -35,17 +33,20 @@ public class BidService {
     private final TransactionRepository transactionRepository;
     private static final int DEFAULT_HIGHEST_BID = 0;
 
+    @Transactional
     //상품 입찰
     public void bidProduct(BidRequest request, CustomUserDetails userDetails) {
         Member member = getAuthenticatedMember(userDetails);
-        Product product = findProductById(request.getProductId());
+        Product product = findProductByIdWithLock(request.getProductId());
         validateProductNotSold(product);
+        validateBidTimeNotExpired(product);
         validateSufficientFunds(member, request.getBidAmount());
         validateHigherBid(request.getBidAmount(), request.getProductId());
         Bid bid = BidConverter.fromDto(request, member, product);
         bidRepository.save(bid);
     }
 
+    @Transactional(readOnly = true)
     //특정 사용자의 입찰 내역 조회
     public List<BidResponse> getUserBids(Long memberId) {
         return bidRepository.findByMemberId(memberId).stream()
@@ -53,6 +54,7 @@ public class BidService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     //현재 최고 입찰가 조회
     public Integer getHighestBid(Long productId) {
         return bidRepository.findTopByProductIdOrderByBidAmountDesc(productId)
@@ -60,10 +62,11 @@ public class BidService {
                 .orElse(DEFAULT_HIGHEST_BID);
     }
 
+    @Transactional
     //즉시구매
     public void buyProduct(BuyRequest request, CustomUserDetails userDetails) {
         Member buyer = getAuthenticatedMember(userDetails);
-        Product product = findProductById(request.getProductId());
+        Product product = findProductByIdWithLock(request.getProductId());
         validateProductNotSold(product);
         validateSufficientFunds(buyer, product.getBuyNowPrice());
         buyer.deductMoney(product.getBuyNowPrice());
@@ -86,8 +89,8 @@ public class BidService {
     }
 
     //상품찾기
-    private Product findProductById(Long productId) {
-        return productRepository.findById(productId)
+    private Product findProductByIdWithLock(Long productId) {
+        return productRepository.findByIdWithLock(productId)
                 .orElseThrow(() -> new ProductNotFoundException("해당 상품을 찾을 수 없습니다."));
     }
 
@@ -112,6 +115,11 @@ public class BidService {
             throw new InvalidBidException("입찰 금액은 현재 최고 입찰 금액보다 높아야 합니다.");
         }
     }
+
+    //입찰 마감 여부
+    private void validateBidTimeNotExpired(Product product) {
+        if (product.getEndTime() != null && product.getEndTime().isBefore(LocalDateTime.now())) {
+            throw new InvalidBidException("입찰 가능 시간이 종료된 상품입니다.");
+        }
+    }
 }
-
-
