@@ -9,15 +9,13 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
-@Builder(toBuilder = true)
+@Builder
 @NoArgsConstructor//기본생성자
 @AllArgsConstructor//모든 필드 포함 생성자
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @ManyToOne(fetch = FetchType.LAZY) // 입찰한 상품
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
@@ -27,18 +25,6 @@ public class Transaction {
     @ManyToOne(fetch = FetchType.LAZY) // 판매한 사용자
     @JoinColumn(name = "seller_id", nullable = false)
     private Member seller;
-
     private int price; // 거래 금액
     private LocalDateTime tradeTime; // 거래 시각
-
-    public static Transaction createTrade(Member buyer, Member seller, Product product, int price) {
-        return Transaction.builder()
-                .buyer(buyer)
-                .seller(seller)
-                .product(product)
-                .price(price)
-                .tradeTime(LocalDateTime.now())
-                .build();
-    }
 }
-
