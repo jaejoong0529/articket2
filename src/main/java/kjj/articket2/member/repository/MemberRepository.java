@@ -16,8 +16,4 @@ public interface MemberRepository extends JpaRepository<Member,Long> {
     Optional<Member> findByUsernameAndEmail(String username, String email);
     boolean existsByUsername(String username);
     boolean existsByNickname(String nickname);
-
-    @Lock(LockModeType.PESSIMISTIC_WRITE) // 사용자 계정 잠금
-    @Query("SELECT m FROM Member m WHERE m.username = :username")
-    Optional<Member> findByUsernameWithLock(@Param("username") String username);
 }
