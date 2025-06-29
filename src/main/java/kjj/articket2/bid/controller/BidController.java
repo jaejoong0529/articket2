@@ -1,5 +1,6 @@
 package kjj.articket2.bid.controller;
 
+import jakarta.validation.Valid;
 import kjj.articket2.bid.dto.*;
 import kjj.articket2.bid.service.BidService;
 import kjj.articket2.global.jwt.CustomUserDetails;
@@ -10,17 +11,16 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-@CrossOrigin(origins = "http://localhost:3000") // React와 연결
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/bid")
+@RequestMapping("/api/bids")
 public class BidController {
     private final BidService bidService;
 
     //입찰하기
     @PostMapping("/bidProduct")
     public ResponseEntity<String> bidProduct(
-            @RequestBody BidRequest request,
+            @RequestBody @Valid BidRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails){
         bidService.bidProduct(request, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body("입찰이 완료되었습니다.");
@@ -48,4 +48,3 @@ public class BidController {
         return ResponseEntity.status(HttpStatus.CREATED).body("즉시 구매 되었습니다.");
     }
 }
-
