@@ -13,6 +13,7 @@ import kjj.articket2.member.repository.MemberRepository;
 import kjj.articket2.product.domain.Product;
 import kjj.articket2.product.exception.ProductNotFoundException;
 import kjj.articket2.product.repository.ProductRepository;
+import kjj.articket2.transaction.TransactionConverter;
 import kjj.articket2.transaction.domain.Transaction;
 import kjj.articket2.transaction.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
@@ -42,8 +43,22 @@ public class BidService {
         validateBidTimeNotExpired(product);
         validateSufficientFunds(member, request.getBidAmount());
         validateHigherBid(request.getBidAmount(), request.getProductId());
-        Bid bid = BidConverter.fromDto(request, member, product);
-        bidRepository.save(bid);
+        // 💡 기존 최고 입찰자 환불 처리
+        Optional<Bid> highestBidOpt = bidRepository.findTopByProductIdOrderByBidAmountDescWithLock(product.getId());
+        if (highestBidOpt.isPresent()) {
+            Bid previousBid = highestBidOpt.get();
+            Member previousBidder = previousBid.getMember();
+
+            previousBidder.addMoney(previousBid.getBidAmount());
+            memberRepository.save(previousBidder);
+        }
+
+        // 💸 새 입찰자 금액 차감
+        member.deductMoney(request.getBidAmount());
+        memberRepository.save(member);
+
+        Bid newBid = BidConverter.fromDto(request, member, product);
+        bidRepository.save(newBid);
     }
 
     @Transactional(readOnly = true)
@@ -57,7 +72,7 @@ public class BidService {
     @Transactional(readOnly = true)
     //현재 최고 입찰가 조회
     public Integer getHighestBid(Long productId) {
-        return bidRepository.findTopByProductIdOrderByBidAmountDesc(productId)
+        return bidRepository.findTopByProductIdOrderByBidAmountDescWithLock(productId)
                 .map(Bid::getBidAmount)
                 .orElse(DEFAULT_HIGHEST_BID);
     }
@@ -73,10 +88,10 @@ public class BidService {
         memberRepository.save(buyer);
         product.markAsSold();
         productRepository.save(product);
-        Transaction trade = Transaction.createTrade(buyer, product.getMember(), product, product.getBuyNowPrice());
+        Transaction trade = TransactionConverter.createTrade(buyer, product.getMember(), product, product.getBuyNowPrice());
+
         transactionRepository.save(trade);
         bidRepository.deleteByProduct(product);
-
     }
 
     //권환 확인
@@ -110,7 +125,7 @@ public class BidService {
 
     //입찰 금액이 현재 최고 입찰가보다 높은지 확인
     private void validateHigherBid(int bidAmount, Long productId) {
-        Optional<Bid> highestBid = bidRepository.findTopByProductIdOrderByBidAmountDesc(productId);
+        Optional<Bid> highestBid = bidRepository.findTopByProductIdOrderByBidAmountDescWithLock(productId);
         if (highestBid.isPresent() && highestBid.get().getBidAmount() >= bidAmount) {
             throw new InvalidBidException("입찰 금액은 현재 최고 입찰 금액보다 높아야 합니다.");
         }
