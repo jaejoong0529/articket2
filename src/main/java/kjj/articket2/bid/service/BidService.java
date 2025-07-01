@@ -17,12 +17,12 @@ import kjj.articket2.transaction.TransactionConverter;
 import kjj.articket2.transaction.domain.Transaction;
 import kjj.articket2.transaction.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,9 +44,9 @@ public class BidService {
         validateSufficientFunds(member, request.getBidAmount());
         validateHigherBid(request.getBidAmount(), request.getProductId());
         // 💡 기존 최고 입찰자 환불 처리
-        Optional<Bid> highestBidOpt = bidRepository.findTopByProductIdOrderByBidAmountDescWithLock(product.getId());
-        if (highestBidOpt.isPresent()) {
-            Bid previousBid = highestBidOpt.get();
+        List<Bid> topBids = bidRepository.findTopByProductIdWithLock(product.getId(), PageRequest.of(0, 1));
+        if (!topBids.isEmpty()) {
+            Bid previousBid = topBids.get(0);
             Member previousBidder = previousBid.getMember();
 
             previousBidder.addMoney(previousBid.getBidAmount());
@@ -72,9 +72,8 @@ public class BidService {
     @Transactional(readOnly = true)
     //현재 최고 입찰가 조회
     public Integer getHighestBid(Long productId) {
-        return bidRepository.findTopByProductIdOrderByBidAmountDescWithLock(productId)
-                .map(Bid::getBidAmount)
-                .orElse(DEFAULT_HIGHEST_BID);
+        List<Bid> topBids = bidRepository.findTopByProductIdWithLock(productId, PageRequest.of(0, 1));
+        return topBids.isEmpty() ? DEFAULT_HIGHEST_BID : topBids.get(0).getBidAmount();
     }
 
     @Transactional
@@ -125,8 +124,8 @@ public class BidService {
 
     //입찰 금액이 현재 최고 입찰가보다 높은지 확인
     private void validateHigherBid(int bidAmount, Long productId) {
-        Optional<Bid> highestBid = bidRepository.findTopByProductIdOrderByBidAmountDescWithLock(productId);
-        if (highestBid.isPresent() && highestBid.get().getBidAmount() >= bidAmount) {
+        List<Bid> topBids = bidRepository.findTopByProductIdWithLock(productId, PageRequest.of(0, 1));
+        if (!topBids.isEmpty() && topBids.get(0).getBidAmount() >= bidAmount) {
             throw new InvalidBidException("입찰 금액은 현재 최고 입찰 금액보다 높아야 합니다.");
         }
     }

@@ -3,7 +3,6 @@ package kjj.articket2.global.scheduler;
 import kjj.articket2.bid.domain.Bid;
 import kjj.articket2.bid.repository.BidRepository;
 import kjj.articket2.member.domain.Member;
-import kjj.articket2.member.repository.MemberRepository;
 import kjj.articket2.product.domain.Product;
 import kjj.articket2.product.repository.ProductRepository;
 import kjj.articket2.transaction.TransactionConverter;
@@ -11,6 +10,7 @@ import kjj.articket2.transaction.domain.Transaction;
 import kjj.articket2.transaction.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +25,6 @@ import java.util.Optional;
 public class AuctionScheduler {
     private final ProductRepository productRepository;
     private final BidRepository bidRepository;
-    private final MemberRepository memberRepository;
     private final TransactionRepository transactionRepository;
 
     @Scheduled(fixedRate = 600000) // 1분마다 실행 (실제 운영에서는 1시간 or 10분마다 실행 추천)
@@ -37,11 +36,11 @@ public class AuctionScheduler {
         List<Product> expiredProducts = productRepository.findAllByEndTimeBeforeAndIsSoldFalse(LocalDateTime.now());
 
         for (Product product : expiredProducts) {
-            Optional<Bid> highestBid = bidRepository.findTopByProductIdOrderByBidAmountDescWithLock(product.getId());
+            List<Bid> highestBid = bidRepository.findTopByProductIdWithLock(product.getId(), PageRequest.of(0, 1));
 
-            if (highestBid.isPresent()) {
+            if (!highestBid.isEmpty()) {
                 // 최고 입찰자가 존재하면 최종 입찰자로 낙찰 처리
-                Bid winningBid = highestBid.get();
+                Bid winningBid = highestBid.get(0);
                 Member winner = winningBid.getMember();
                 Member seller = product.getMember();
 
