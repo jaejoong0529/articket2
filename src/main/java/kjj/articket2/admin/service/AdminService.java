@@ -43,14 +43,20 @@ public class AdminService {
                 .collect(Collectors.toList());
     }
     public void deleteMember(Long memberId) {
+        memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberNotFoundException("해당 회원이 존재하지 않습니다."));
         memberRepository.deleteById(memberId);
     }
 
     public void deleteProduct(Long productId) {
+        productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("해당 상품이 존재하지 않습니다."));
         productRepository.deleteById(productId);
     }
 
     public void deleteTransaction(Long transactionId) {
+        transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new TransactionNotFoundException("해당 거래 내역이 존재하지 않습니다."));
         transactionRepository.deleteById(transactionId);
     }
 }
