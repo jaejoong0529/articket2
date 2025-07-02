@@ -21,4 +21,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findByIdWithLock(@Param("id") Long id);
 
     List<Product> findByCategory(Category category);
+
+    // 판매 상태로 필터링
+    List<Product> findByIsSold(boolean isSold);
 }

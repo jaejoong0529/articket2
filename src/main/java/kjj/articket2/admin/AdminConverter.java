@@ -3,7 +3,6 @@ package kjj.articket2.admin;
 import kjj.articket2.admin.dto.AdminMemberResponseDto;
 import kjj.articket2.admin.dto.AdminProductResponseDto;
 import kjj.articket2.admin.dto.AdminTransactionResponseDto;
-import kjj.articket2.bid.domain.Bid;
 import kjj.articket2.member.domain.Member;
 import kjj.articket2.product.domain.Product;
 import kjj.articket2.transaction.domain.Transaction;
@@ -25,7 +24,7 @@ public class AdminConverter {
                 .buyer(tx.getBuyer().getUsername())
                 .seller(tx.getSeller().getUsername())
                 .price(tx.getPrice())
-                .date(tx.getTradeTime().toString())
+                .date(tx.getTradeTime().toLocalDate().toString())
                 .build();
     }
 

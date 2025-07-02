@@ -4,6 +4,7 @@ import kjj.articket2.bid.exception.InvalidBidException;
 import kjj.articket2.member.exception.*;
 import kjj.articket2.product.exception.FileStorageException;
 import kjj.articket2.product.exception.ProductNotFoundException;
+import kjj.articket2.transaction.exception.TransactionNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,6 +24,10 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<String> handleProductNotFound(ProductNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+    @ExceptionHandler(TransactionNotFoundException.class)
+    public ResponseEntity<String> handleTransactionNotFound(TransactionNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
     @ExceptionHandler(InvalidPasswordException.class)

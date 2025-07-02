@@ -10,16 +10,15 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin")
-@CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping("/api/admin")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
     private final AdminService adminService;
 
-
-    @PreAuthorize("hasRole('ADMIN')") // Spring Security 권한 체크
     @GetMapping("/dashboard")
     public ResponseEntity<String> getAdminDashboard() {
         return ResponseEntity.ok("관리자 대시보드");
@@ -51,5 +50,20 @@ public class AdminController {
     public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) {
         adminService.deleteTransaction(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/members/search")
+    public ResponseEntity<List<AdminMemberResponseDto>> searchMembers(@RequestParam String keyword) {
+        return ResponseEntity.ok(adminService.searchMembers(keyword));
+    }
+
+    @GetMapping("/products/filter")
+    public ResponseEntity<List<AdminProductResponseDto>> filterProducts(@RequestParam boolean isSold) {
+        return ResponseEntity.ok(adminService.filterProducts(isSold));
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<Map<String, Long>> getSummary() {
+        return ResponseEntity.ok(adminService.getWeeklySummary());
     }
 }
