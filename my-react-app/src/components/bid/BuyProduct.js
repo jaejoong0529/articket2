@@ -22,8 +22,8 @@ function BuyProduct() {
             alert('즉시 구매 되었습니다.');
             navigate(`/products/${productId}`);
         } catch (error) {
-            console.error('즉시 구매 실패:', error);
-            alert('즉시 구매에 실패했습니다.');
+            const errorMessage = error.response?.data || '구매에 실패했습니다.';
+            alert(`구매 실패: ${errorMessage}`);
         }
     };
 

@@ -14,8 +14,8 @@ function ProductDelete() {
             alert('상품이 성공적으로 삭제되었습니다.');
             navigate('/products');
         } catch (error) {
-            console.error('Error deleting product:', error);
-            alert('상품 삭제에 실패했습니다.');
+            const errorMessage = error.response?.data || '삭제에 실패했습니다.';
+            alert(`삭제 실패: ${errorMessage}`);
         }
     };
 

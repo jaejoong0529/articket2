@@ -68,8 +68,8 @@ function ProductDetail() {
                 <p>판매자: {product.sellerUsername}</p>
                 <p>시작가: {formatPrice(product.price)} 원</p>
                 <p>즉시 구매가: {formatPrice(product.buyNowPrice)} 원</p>
-                <p>등록일: {product.createdAt}</p>
-                <p>종료일: {product.endTime}</p>
+                <p>등록일: {new Date(product.createdAt).toLocaleString()}</p>
+                <p>종료일: {new Date(product.endTime).toLocaleString()}</p>
                 <p>현재 최고 입찰가: {formatPrice(highestBid)} 원</p>
                 {product.image && (
                     <img

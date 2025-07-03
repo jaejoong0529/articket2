@@ -30,8 +30,8 @@ function CreateProduct() {
             alert("상품이 성공적으로 등록되었습니다.");
             navigate("/products");
         } catch (error) {
-            console.error("상품 등록 실패:", error);
-            alert("상품 등록에 실패했습니다.");
+            const errorMessage = error.response?.data || '상품 등록 실패했습니다.';
+            alert(`등록 실패: ${errorMessage}`);
         }
     };
 
