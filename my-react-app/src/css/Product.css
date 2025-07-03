@@ -164,3 +164,25 @@
 .delete-confirmation button:last-child:hover {
     background-color: #e53935;
 }
+
+.sold-label {
+    color: red;
+    font-weight: bold;
+}
+
+.product-item.sold {
+    opacity: 0.6;
+    position: relative;
+}
+
+.product-item.sold::after {
+    content: "판매 완료";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(255, 0, 0, 0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
