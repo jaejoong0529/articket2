@@ -39,18 +39,32 @@ public class ProductService {
         productRepository.save(product);
     }
 
-    //상품 목록 조회
     @Transactional(readOnly = true)
-    public List<ProductResponse> getAllProducts() {
-        return productRepository.findAll().stream()
+    public List<ProductResponse> getAllProducts(String search) {
+        List<Product> products;
+
+        if (search != null && !search.isBlank()) {
+            products = productRepository.findByProductNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(search, search);
+        } else {
+            products = productRepository.findAll();
+        }
+
+        return products.stream()
                 .map(ProductConverter::fromEntity)
                 .collect(Collectors.toList());
     }
 
-    //카테고리별 상품 목록 조회
     @Transactional(readOnly = true)
-    public List<ProductResponse> getProductsByCategory(Category category) {
-        List<Product> products = productRepository.findByCategory(category);
+    public List<ProductResponse> getProductsByCategory(Category category, String search) {
+        List<Product> products;
+
+        if (search != null && !search.isBlank()) {
+            products = productRepository.findByCategoryAndProductNameContainingIgnoreCaseOrCategoryAndDescriptionContainingIgnoreCase(
+                    category, search, category, search);
+        } else {
+            products = productRepository.findByCategory(category);
+        }
+
         return products.stream()
                 .map(ProductConverter::fromEntity)
                 .collect(Collectors.toList());

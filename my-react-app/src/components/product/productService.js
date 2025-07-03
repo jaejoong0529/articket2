@@ -1,14 +1,19 @@
 import axios from 'axios';
 import { getAccessToken } from '../member/authService';
 
-const API_BASE_URL = "http://localhost:8080/product";
+const API_BASE_URL = "http://localhost:8080/api/products";
 
-export const getProducts = async (category) => {
+export const getProducts = async (category, search) => {
     const token = getAccessToken();
     let url = API_BASE_URL;
 
     if (category) {
-        url = `${API_BASE_URL}/category/${category}`;
+        url += `/category/${category}`;
+    }
+
+    const params = {};
+    if (search) {
+        params.search = search;
     }
 
     return axios.get(url, {
@@ -16,6 +21,7 @@ export const getProducts = async (category) => {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
         },
+        params,
     });
 };
 

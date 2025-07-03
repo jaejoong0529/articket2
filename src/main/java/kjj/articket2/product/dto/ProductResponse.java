@@ -16,4 +16,5 @@ public class ProductResponse {
     private Integer price;
     private Integer buyNowPrice;
     private String image;
+    private boolean isSold;
 }

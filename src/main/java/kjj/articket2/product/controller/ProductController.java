@@ -33,17 +33,18 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body("상품이 성공적으로 등록되었습니다.");
     }
 
-    //상품 전체 조회
-    @GetMapping()
-    public ResponseEntity<List<ProductResponse>> getAllProducts() {
-        List<ProductResponse> products = productService.getAllProducts();
+    // 전체 상품 조회 + 검색 기능
+    @GetMapping
+    public ResponseEntity<List<ProductResponse>> getAllProducts(@RequestParam(required = false) String search) {
+        List<ProductResponse> products = productService.getAllProducts(search);
         return ResponseEntity.ok(products);
     }
 
-    //카테고리별 상품 조회
+    // 카테고리별 상품 조회 + 검색 기능
     @GetMapping("/category/{category}")
-    public ResponseEntity<List<ProductResponse>> getProductsByCategory(@PathVariable Category category) {
-        List<ProductResponse> products = productService.getProductsByCategory(category);
+    public ResponseEntity<List<ProductResponse>> getProductsByCategory(@PathVariable Category category,
+                                                                       @RequestParam(required = false) String search) {
+        List<ProductResponse> products = productService.getProductsByCategory(category, search);
         return ResponseEntity.ok(products);
     }
 

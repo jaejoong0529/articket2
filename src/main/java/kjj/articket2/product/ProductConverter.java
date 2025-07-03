@@ -32,6 +32,7 @@ public class ProductConverter {
                 .price(product.getPrice())
                 .buyNowPrice(product.getBuyNowPrice())
                 .image(product.getImage()) // 이미지 URL 설정
+                .isSold(product.isSold())
                 .build();
     }
     public static ProductDetailResponse fromDetailEntity(Product product) {
