@@ -23,6 +23,9 @@ import AdminHome from './components/admin/AdminHome';
 import AdminMemberList from './components/admin/AdminMemberList';
 import AdminProductList from './components/admin/AdminProductList';
 import AdminTransactionList from './components/admin/AdminTransactionList';
+import AdminSummary from "./components/admin/AdminSummary";
+import AdminUserSearch from "./components/admin/AdminUserSearch";
+import AdminProductFilter from "./components/admin/AdminProductFilter";
 
 function App() {
     return (
@@ -51,6 +54,9 @@ function App() {
                 <Route path="/admin/users" element={<AdminMemberList />} />
                 <Route path="/admin/products" element={<AdminProductList />} />
                 <Route path="/admin/transactions" element={<AdminTransactionList />} />
+                <Route path="/admin/members/search" element={<AdminUserSearch />} />
+                <Route path="/admin/products/filter" element={<AdminProductFilter />} />
+                <Route path="/admin/summary" element={<AdminSummary />} />
             </Routes>
         </Router>
     );
