@@ -21,8 +21,9 @@ function Login() {
             } else {
                 navigate('/products');
             }
-        } catch (error) {
-            alert('로그인 실패: ' + error.message);
+        }catch (error) {
+            const errorMessage = error.response?.data || '로그인에 실패했습니다.';
+            alert(`로그인 실패: ${errorMessage}`);
         }
     };
 

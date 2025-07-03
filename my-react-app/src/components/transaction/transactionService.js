@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = "http://localhost:8080/api/transactions";
 
 export const getBoughtProducts = () => {
     return axios.get(`${BASE_URL}/bought`, {

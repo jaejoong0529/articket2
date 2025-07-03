@@ -64,7 +64,7 @@ export const refreshToken = async (refreshTokenValue) => {
 export const fetchCurrentUser = async () => {
     try {
         const accessToken = getAccessToken();
-        const response = await axios.get("http://localhost:8080/api/me", {
+        const response = await axios.get("http://localhost:8080/api/members/me", {
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }
