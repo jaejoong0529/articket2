@@ -24,4 +24,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // 판매 상태로 필터링
     List<Product> findByIsSold(boolean isSold);
+
+    // ✅ 검색어 포함된 상품 조회
+    List<Product> findByProductNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String name, String description);
+
+    // ✅ 카테고리 + 검색어 조합 조회
+    List<Product> findByCategoryAndProductNameContainingIgnoreCaseOrCategoryAndDescriptionContainingIgnoreCase(
+            Category category1, String name,
+            Category category2, String description
+    );
 }
