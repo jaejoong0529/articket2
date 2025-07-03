@@ -85,6 +85,9 @@ public class BidService {
         validateSufficientFunds(buyer, product.getBuyNowPrice());
         buyer.deductMoney(product.getBuyNowPrice());
         memberRepository.save(buyer);
+        Member seller = product.getMember();
+        seller.addMoney(product.getBuyNowPrice());
+        memberRepository.save(seller);
         product.markAsSold();
         productRepository.save(product);
         Transaction trade = TransactionConverter.createTrade(buyer, product.getMember(), product, product.getBuyNowPrice());
