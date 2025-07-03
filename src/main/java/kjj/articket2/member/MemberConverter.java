@@ -39,6 +39,10 @@ public  class MemberConverter {
                 .orElse("ROLE_USER");
         return MemberDto.builder()
                 .username(userDetails.getUsername())
+                .nickname(userDetails.getNickname()) // 필요 시 CustomUserDetails에 필드 추가
+                .email(userDetails.getEmail())
+                .name(userDetails.getName())
+                .money(userDetails.getMoney())
                 .role(role)
                 .build();
     }

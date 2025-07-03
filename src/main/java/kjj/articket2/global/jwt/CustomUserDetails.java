@@ -49,4 +49,19 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+    public String getName() {
+        return member.getName();
+    }
+
+    public String getNickname() {
+        return member.getNickname();
+    }
+
+    public String getEmail() {
+        return member.getEmail();
+    }
+
+    public int getMoney() {
+        return member.getMoney();
+    }
 }

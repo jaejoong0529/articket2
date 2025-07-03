@@ -100,3 +100,14 @@ export const rechargeMoney = async (rechargeMoneyData) => {
         throw error;
     }
 };
+
+export const getMyInfo = async () => {
+    try {
+        return await authApiFetch(`${API_BASE_URL}/me`, {
+            method: "GET",
+        });
+    } catch (error) {
+        console.error("Get my info error:", error);
+        throw error;
+    }
+};

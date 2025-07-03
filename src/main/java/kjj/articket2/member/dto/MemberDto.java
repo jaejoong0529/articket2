@@ -11,5 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MemberDto {
     private String username;
+    private String nickname;
+    private String email;
+    private String name;
+    private int money;
     private String role;
 }
