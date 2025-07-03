@@ -22,7 +22,7 @@ function RechargeMoney() {
         const amountNumber = parseInt(amount.replace(/,/g, ''), 10); // 콤마 제거 후 숫자로 변환
         try {
             await axios.post(
-                "http://localhost:8080/recharge",
+                "http://localhost:8080/api/members/recharge",
                 { amount: amountNumber },
                 {
                     headers: {
@@ -34,8 +34,8 @@ function RechargeMoney() {
             alert("돈 충전이 완료되었습니다.");
             navigate("/products");
         } catch (error) {
-            console.error("Error recharging money:", error);
-            alert("돈 충전에 실패했습니다.");
+            const errorMessage = error.response?.data || '충전 실패했습니다.';
+            alert(`충전 실패: ${errorMessage}`);
         }
     };
 

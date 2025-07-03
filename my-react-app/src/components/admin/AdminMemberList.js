@@ -31,7 +31,8 @@ function AdminMemberList() {
                 await deleteMember(id);
                 setMembers(prev => prev.filter(member => member.memberId !== id));
             } catch (error) {
-                console.error("회원 삭제 실패:", error);
+                const errorMessage = error.response?.data || '삭제에 실패했습니다.';
+                alert(`삭제 실패: ${errorMessage}`);
             }
         }
     };
