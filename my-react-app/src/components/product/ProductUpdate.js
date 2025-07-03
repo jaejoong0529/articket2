@@ -7,12 +7,14 @@ import '../../css/Product.css';
 function ProductUpdate() {
     const { id } = useParams();
     const navigate = useNavigate();
+
     const [product, setProduct] = useState(null);
     const [productName, setProductName] = useState('');
     const [price, setPrice] = useState('');
     const [buyNowPrice, setBuyNowPrice] = useState('');
     const [description, setDescription] = useState('');
     const [image, setImage] = useState(null);
+    const [category, setCategory] = useState('');
 
     useEffect(() => {
         getProductDetail(id).then((response) => {
@@ -22,6 +24,7 @@ function ProductUpdate() {
             setPrice(formatNumber(productData.price.toString()));
             setBuyNowPrice(formatNumber(productData.buyNowPrice.toString()));
             setDescription(productData.description);
+            setCategory(productData.category); //  기존 카테고리 값 세팅
         });
     }, [id]);
 
@@ -32,12 +35,10 @@ function ProductUpdate() {
 
     const handlePriceChange = (e) => {
         setPrice(e.target.value);
-        // Optionally format while typing if desired: setPrice(formatNumber(e.target.value));
     };
 
     const handleBuyNowPriceChange = (e) => {
         setBuyNowPrice(e.target.value);
-        // Optionally format while typing if desired: setBuyNowPrice(formatNumber(e.target.value));
     };
 
     const handleSubmit = async (e) => {
@@ -46,16 +47,25 @@ function ProductUpdate() {
         const buyNowPriceNumber = parseInt(buyNowPrice.replace(/,/g, ''), 10);
 
         try {
-            await updateProduct(id, { request: { productName, price: priceNumber, buyNowPrice: buyNowPriceNumber, description }, image });
+            await updateProduct(id, {
+                request: {
+                    productName,
+                    price: priceNumber,
+                    buyNowPrice: buyNowPriceNumber,
+                    description,
+                    category, //  포함
+                },
+                image,
+            });
             alert('상품이 성공적으로 수정되었습니다.');
             navigate(`/products/${id}`);
         } catch (error) {
-            console.error('Error updating product:', error);
-            alert('상품 수정에 실패했습니다.');
+            const errorMessage = error.response?.data || '수정에 실패했습니다.';
+            alert(`수정 실패: ${errorMessage}`);
         }
     };
 
-    if (!product) return <div className="loading-message">Loading product details...</div>;
+    if (!product) return <div className="loading-message">상품 정보를 불러오는 중...</div>;
 
     return (
         <div className="home-container">
@@ -64,20 +74,58 @@ function ProductUpdate() {
                     Articket
                 </div>
             </header>
+
             <div className="product-update-container">
                 <h2>상품 수정</h2>
                 <form onSubmit={handleSubmit}>
-                    <input type="text" placeholder="상품 이름" value={productName}
-                           onChange={(e) => setProductName(e.target.value)}/>
-                    <input type="text" placeholder="시작가" value={price} onChange={handlePriceChange}/>
-                    <input type="text" placeholder="즉시 구매가" value={buyNowPrice} onChange={handleBuyNowPriceChange}/>
-                    <textarea placeholder="상품 설명" value={description} onChange={(e) => setDescription(e.target.value)}/>
-                    <input type="file" onChange={(e) => setImage(e.target.files[0])}/>
+                    <input
+                        type="text"
+                        placeholder="상품 이름"
+                        value={productName}
+                        onChange={(e) => setProductName(e.target.value)}
+                        required
+                    />
+                    <input
+                        type="text"
+                        placeholder="시작가"
+                        value={price}
+                        onChange={handlePriceChange}
+                        required
+                    />
+                    <input
+                        type="text"
+                        placeholder="즉시 구매가"
+                        value={buyNowPrice}
+                        onChange={handleBuyNowPriceChange}
+                        required
+                    />
+                    <textarea
+                        placeholder="상품 설명"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        required
+                    />
+                    <select value={category} onChange={(e) => setCategory(e.target.value)} required>
+                        <option value="">카테고리 선택</option>
+                        <option value="ELECTRONICS">전자제품</option>
+                        <option value="FASHION">의류</option>
+                        <option value="BOOKS">책</option>
+                        <option value="SPORTS">스포츠</option>
+                        <option value="BEAUTY">뷰티</option>
+                    </select>
+                    <input
+                        type="file"
+                        onChange={(e) => setImage(e.target.files[0])}
+                        accept="image/*"
+                    />
                     <button type="submit">수정</button>
                 </form>
+
                 <div className="button-group">
-                    <button onClick={() => navigate(-1)}>뒤로 가기</button>
-                    {/* Add other header buttons if needed */}
+                    <button onClick={() => navigate(-1)}>← 뒤로 가기</button>
+                    <Link to={`/products/${id}`}>
+                        <button>상품 상세로 이동</button>
+                    </Link>
                 </div>
             </div>
         </div>
