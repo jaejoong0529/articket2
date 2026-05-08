@@ -65,6 +65,16 @@ public class JwtUtil {
                 .getBody()
                 .get("role", String.class);
     }
+
+    public long getRemainingExpirationSeconds(String token) {
+        Date expiration = Jwts.parserBuilder().setSigningKey(key).build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration();
+        long remainingMillis = expiration.getTime() - System.currentTimeMillis();
+        return Math.max(0, remainingMillis / 1000);
+    }
+
     //유효성 검사
     public boolean validateToken(String token) {
         try {

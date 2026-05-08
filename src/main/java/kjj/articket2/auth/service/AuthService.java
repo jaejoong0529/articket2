@@ -3,6 +3,8 @@ package kjj.articket2.auth.service;
 import jakarta.servlet.http.HttpServletRequest;
 import kjj.articket2.auth.dto.*;
 import kjj.articket2.global.exception.InvalidTokenException;
+import kjj.articket2.global.jwt.BlacklistedToken;
+import kjj.articket2.global.jwt.BlacklistedTokenRepository;
 import kjj.articket2.global.jwt.JwtUtil;
 import kjj.articket2.global.jwt.RefreshToken;
 import kjj.articket2.global.jwt.RefreshTokenRepository;
@@ -29,6 +31,7 @@ import static kjj.articket2.global.jwt.TokenValidator.INVALID_TOKEN;
 public class AuthService {
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final BlacklistedTokenRepository blacklistedTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
     private final TokenValidator tokenValidator;
@@ -61,6 +64,7 @@ public class AuthService {
         String token = jwtUtil.extractToken(request);
         if (token == null) return;
         String username = jwtUtil.getUsernameFromToken(token);
+        blacklistAccessToken(token);
         refreshTokenRepository.deleteById(username);
         SecurityContextHolder.clearContext();
     }
@@ -74,7 +78,9 @@ public class AuthService {
         RefreshToken storedToken = getStoredToken(username);
         validateStoredToken(oldRefreshToken, storedToken);
 
-        String role = jwtUtil.getRoleFromToken(oldRefreshToken);
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new MemberNotFoundException("일치하는 정보가 없습니다."));
+        String role = member.getRole().name();
         String newAccessToken = jwtUtil.generateAccessToken(username, role);
         String newRefreshToken = jwtUtil.generateRefreshToken(username);
 
@@ -96,6 +102,13 @@ public class AuthService {
 
     private void validateStoredToken(String requestToken, RefreshToken storedToken) {
         tokenValidator.validateTokenMatches(requestToken, storedToken.getToken());
+    }
+
+    private void blacklistAccessToken(String accessToken) {
+        long ttlSeconds = jwtUtil.getRemainingExpirationSeconds(accessToken);
+        if (ttlSeconds > 0) {
+            blacklistedTokenRepository.save(new BlacklistedToken(accessToken, ttlSeconds));
+        }
     }
 
     //중복확인

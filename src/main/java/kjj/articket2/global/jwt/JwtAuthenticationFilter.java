@@ -22,6 +22,7 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+    private final BlacklistedTokenRepository blacklistedTokenRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -37,6 +38,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
+                if (blacklistedTokenRepository.existsById(token)) {
+                    throw new RuntimeException("로그아웃된 토큰입니다.");
+                }
                 if (jwtUtil.validateToken(token)) {  // 유효한 토큰인지 확인
                     String username = jwtUtil.getUsernameFromToken(token);
                     String role = jwtUtil.getRoleFromToken(token);  //역할(Role) 가져오기
