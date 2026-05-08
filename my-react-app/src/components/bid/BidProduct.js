@@ -10,6 +10,7 @@ function BidProduct() {
     const [bidAmount, setBidAmount] = useState('');
     const [highestBid, setHighestBid] = useState(0);
     const [product, setProduct] = useState(null); //  상품 정보 상태
+    const [submitting, setSubmitting] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -40,6 +41,7 @@ function BidProduct() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setSubmitting(true);
         try {
             await bidProduct(productId, parseInt(bidAmount, 10));
             alert('입찰이 완료되었습니다.');
@@ -47,43 +49,57 @@ function BidProduct() {
         } catch (error) {
             const errorMessage = error.response?.data || '입찰에 실패했습니다.';
             alert(`입찰 실패: ${errorMessage}`);
+        } finally {
+            setSubmitting(false);
         }
     };
 
     return (
-        <div className="home-container">
-            <header className="home-header">
-                <div className="logo" onClick={() => navigate('/products')}>Articket</div>
+        <div className="app-shell home-container">
+            <header className="home-header app-header">
+                <button className="logo brand-button" onClick={() => navigate('/products')}>Articket</button>
+                <nav className="header-actions" aria-label="입찰 메뉴">
+                    <button className="ghost-button" onClick={() => navigate(`/products/${productId}`)}>상세</button>
+                    <button className="ghost-button" onClick={() => navigate('/products')}>목록</button>
+                </nav>
             </header>
 
-            <div className="bid-container">
-                <h2>상품 입찰</h2>
+            <main className="bid-page">
+                <section className="bid-summary">
+                    <p className="eyebrow">BID</p>
+                    <h1>{product?.productName || '상품 입찰'}</h1>
+                    {product && (
+                        <dl className="bid-price-grid">
+                            <div>
+                                <dt>시작가</dt>
+                                <dd>{formatPrice(product.price)}원</dd>
+                            </div>
+                            <div>
+                                <dt>현재 최고가</dt>
+                                <dd>{highestBid === 0 ? '입찰 없음' : `${formatPrice(highestBid)}원`}</dd>
+                            </div>
+                        </dl>
+                    )}
+                </section>
 
-                {product && (
-                    <p>
-                        {highestBid === 0
-                            ? `현재 입찰가가 없습니다. (시작가: ${formatPrice(product.price)}원)`
-                            : `현재 최고 입찰가: ${formatPrice(highestBid)}원`}
-                    </p>
-                )}
-
-                <form onSubmit={handleSubmit}>
-                    <input
-                        type="number"
-                        placeholder="입찰 금액"
-                        value={bidAmount}
-                        onChange={(e) => setBidAmount(e.target.value)}
-                    />
-                    <button type="submit">입찰</button>
-                </form>
-            </div>
-
-            <div className="button-group">
-                <button onClick={() => navigate(-1)}>뒤로 가기</button>
-                <Link to={`/products/${productId}`}>
-                    <button>상세 정보</button>
-                </Link>
-            </div>
+                <section className="bid-container">
+                    <h2>입찰 금액</h2>
+                    <form onSubmit={handleSubmit}>
+                        <input
+                            type="number"
+                            min={highestBid || product?.price || 1}
+                            placeholder="입찰 금액"
+                            value={bidAmount}
+                            onChange={(e) => setBidAmount(e.target.value)}
+                            required
+                        />
+                        <button className="primary-button" type="submit" disabled={submitting}>
+                            {submitting ? '처리 중' : '입찰하기'}
+                        </button>
+                    </form>
+                    <Link className="subtle-link" to={`/products/${productId}`}>상품 상세로 돌아가기</Link>
+                </section>
+            </main>
         </div>
     );
 }

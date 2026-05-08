@@ -38,6 +38,11 @@ function ProductDetail() {
         return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     };
 
+    const formatDate = (date) => {
+        if (!date) return "-";
+        return new Date(date).toLocaleString();
+    };
+
     if (loading) {
         return <div className="loading-message">상품 정보를 로딩 중입니다...</div>;
     }
@@ -56,46 +61,73 @@ function ProductDetail() {
     }
 
     return (
-        <div className="home-container">
-            <header className="home-header">
-                <div className="logo" onClick={() => navigate('/products')}>
+        <div className="app-shell home-container">
+            <header className="home-header app-header">
+                <button className="logo brand-button" onClick={() => navigate('/products')}>
                     Articket
-                </div>
+                </button>
+                <nav className="header-actions" aria-label="상세 메뉴">
+                    <button className="ghost-button" onClick={() => navigate('/products')}>목록</button>
+                    <button className="ghost-button" onClick={() => navigate('/myinfo')}>내 거래</button>
+                </nav>
             </header>
-            <div className="product-detail-body centered-content">
-                <h1>{product.productName}</h1>
-                <p>상품 ID: {product.id}</p>
-                <p>판매자: {product.sellerUsername}</p>
-                <p>시작가: {formatPrice(product.price)} 원</p>
-                <p>즉시 구매가: {formatPrice(product.buyNowPrice)} 원</p>
-                <p>등록일: {new Date(product.createdAt).toLocaleString()}</p>
-                <p>종료일: {new Date(product.endTime).toLocaleString()}</p>
-                <p>현재 최고 입찰가: {formatPrice(highestBid)} 원</p>
-                {product.image && (
-                    <img
-                        src={`http://localhost:8080${product.image}`}
-                        alt={product.productName}
-                        onError={() => setImageError(true)}
-                    />
-                )}
-                {imageError && <p className="error-message">이미지를 불러오는데 실패했습니다.</p>}
-                <p>{product.description}</p>
-                <div className="button-group">
-                    <Link to={`/products/update/${product.id}`}>
-                        <button>수정</button>
-                    </Link>
-                    <Link to={`/products/delete/${product.id}`}>
-                        <button>삭제</button>
-                    </Link>
-                    <Link to={`/buy/${product.id}`}>
-                        <button>즉시 구매</button>
-                    </Link>
-                    <Link to={`/bid/${product.id}`}>
-                        <button>입찰하기</button>
-                    </Link>
-                    <button onClick={() => navigate(-1)}>뒤로 가기</button>
-                </div>
-            </div>
+
+            <main className="detail-page">
+                <section className="detail-media">
+                    {product.image && !imageError ? (
+                        <img
+                            src={`http://localhost:8080${product.image}`}
+                            alt={product.productName}
+                            onError={() => setImageError(true)}
+                        />
+                    ) : (
+                        <div className="detail-placeholder">{product.productName?.slice(0, 2) || "AR"}</div>
+                    )}
+                </section>
+
+                <section className="detail-panel">
+                    <p className="eyebrow">상품 #{product.id}</p>
+                    <h1>{product.productName}</h1>
+                    <p className="detail-description">{product.description}</p>
+
+                    <dl className="detail-prices">
+                        <div>
+                            <dt>현재 최고가</dt>
+                            <dd>{formatPrice(highestBid)}원</dd>
+                        </div>
+                        <div>
+                            <dt>즉시구매가</dt>
+                            <dd>{formatPrice(product.buyNowPrice)}원</dd>
+                        </div>
+                        <div>
+                            <dt>시작가</dt>
+                            <dd>{formatPrice(product.price)}원</dd>
+                        </div>
+                    </dl>
+
+                    <dl className="detail-meta">
+                        <div>
+                            <dt>판매자</dt>
+                            <dd>{product.sellerUsername}</dd>
+                        </div>
+                        <div>
+                            <dt>등록일</dt>
+                            <dd>{formatDate(product.createdAt)}</dd>
+                        </div>
+                        <div>
+                            <dt>종료일</dt>
+                            <dd>{formatDate(product.endTime)}</dd>
+                        </div>
+                    </dl>
+
+                    <div className="detail-actions">
+                        <Link to={`/bid/${product.id}`}><button className="primary-button">입찰하기</button></Link>
+                        <Link to={`/buy/${product.id}`}><button className="secondary-button">즉시구매</button></Link>
+                        <Link to={`/products/update/${product.id}`}><button className="ghost-button">수정</button></Link>
+                        <Link to={`/products/delete/${product.id}`}><button className="danger-button">삭제</button></Link>
+                    </div>
+                </section>
+            </main>
         </div>
     );
 }
