@@ -34,7 +34,7 @@ public class AuctionScheduler {
         log.info("경매 마감 스케줄러 실행 중...");
 
         // 경매 시간이 종료된 상품 찾기 (현재 시간보다 종료 시간이 이전인 상품)
-        List<Product> expiredProducts = productRepository.findAllByEndTimeBeforeAndIsSoldFalse(LocalDateTime.now());
+        List<Product> expiredProducts = productRepository.findExpiredProductsWithLock(LocalDateTime.now());
 
         for (Product product : expiredProducts) {
             List<Bid> highestBid = bidRepository.findTopByProductIdWithLock(product.getId(), PageRequest.of(0, 1));

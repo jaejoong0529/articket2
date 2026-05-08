@@ -34,8 +34,9 @@ public class BidController {
 
     //특정 사용자의 입찰 내역 조회
     @GetMapping("/member/{memberId}")
-    public ResponseEntity<List<BidResponse>> getUserBids(@PathVariable Long memberId) {
-        List<BidResponse> bidResponses = bidService.getUserBids(memberId);
+    public ResponseEntity<List<BidResponse>> getUserBids(@PathVariable Long memberId,
+                                                         @AuthenticationPrincipal CustomUserDetails userDetails) {
+        List<BidResponse> bidResponses = bidService.getUserBids(memberId, userDetails);
         return ResponseEntity.ok(bidResponses);
     }
 

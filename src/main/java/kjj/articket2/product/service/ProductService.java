@@ -1,6 +1,8 @@
 package kjj.articket2.product.service;
 
 import kjj.articket2.global.jwt.CustomUserDetails;
+import kjj.articket2.bid.domain.Bid;
+import kjj.articket2.bid.repository.BidRepository;
 import kjj.articket2.member.domain.Member;
 import kjj.articket2.member.exception.AuthenticationException;
 import kjj.articket2.member.exception.MemberNotFoundException;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +32,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
     private final FileService fileService;
+    private final BidRepository bidRepository;
 
     //상품등록
     @Transactional
@@ -49,8 +53,13 @@ public class ProductService {
             products = productRepository.findAll();
         }
 
+        Map<Long, Integer> highestBidByProductId = getHighestBidByProductId(products);
+
         return products.stream()
-                .map(ProductConverter::fromEntity)
+                .map(product -> ProductConverter.fromEntity(
+                        product,
+                        highestBidByProductId.getOrDefault(product.getId(), 0)
+                ))
                 .collect(Collectors.toList());
     }
 
@@ -65,8 +74,13 @@ public class ProductService {
             products = productRepository.findByCategory(category);
         }
 
+        Map<Long, Integer> highestBidByProductId = getHighestBidByProductId(products);
+
         return products.stream()
-                .map(ProductConverter::fromEntity)
+                .map(product -> ProductConverter.fromEntity(
+                        product,
+                        highestBidByProductId.getOrDefault(product.getId(), 0)
+                ))
                 .collect(Collectors.toList());
     }
 
@@ -132,5 +146,22 @@ public class ProductService {
         if (!product.getMember().getId().equals(member.getId())) {
             throw new AuthenticationException("권한이 없습니다.");
         }
+    }
+
+    private Map<Long, Integer> getHighestBidByProductId(List<Product> products) {
+        List<Long> productIds = products.stream()
+                .map(Product::getId)
+                .toList();
+
+        if (productIds.isEmpty()) {
+            return Map.of();
+        }
+
+        return bidRepository.findHighestBidsByProductIds(productIds).stream()
+                .collect(Collectors.toMap(
+                        bid -> bid.getProduct().getId(),
+                        Bid::getBidAmount,
+                        Math::max
+                ));
     }
 }

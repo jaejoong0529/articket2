@@ -7,6 +7,7 @@ import kjj.articket2.bid.exception.InvalidBidException;
 import kjj.articket2.bid.repository.BidRepository;
 import kjj.articket2.global.jwt.CustomUserDetails;
 import kjj.articket2.member.domain.Member;
+import kjj.articket2.member.domain.Role;
 import kjj.articket2.member.exception.AuthenticationException;
 import kjj.articket2.member.exception.MemberNotFoundException;
 import kjj.articket2.member.repository.MemberRepository;
@@ -23,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,19 +44,14 @@ public class BidService {
         Product product = findProductByIdWithLock(request.getProductId());
         validateProductNotSold(product);
         validateBidTimeNotExpired(product);
-        validateSufficientFunds(member, request.getBidAmount());
-        validateHigherBid(request.getBidAmount(), request.getProductId());
-        // 💡 기존 최고 입찰자 환불 처리
-        List<Bid> topBids = bidRepository.findTopByProductIdWithLock(product.getId(), PageRequest.of(0, 1));
-        if (!topBids.isEmpty()) {
-            Bid previousBid = topBids.get(0);
-            Member previousBidder = previousBid.getMember();
+        validateNotSeller(product, member);
 
-            previousBidder.addMoney(previousBid.getBidAmount());
-            memberRepository.save(previousBidder);
-        }
+        Optional<Bid> currentHighestBid = findHighestBidWithLock(product.getId());
+        validateHigherBid(request.getBidAmount(), product, currentHighestBid);
+        validateSufficientFunds(member, request.getBidAmount(), currentHighestBid);
 
-        // 💸 새 입찰자 금액 차감
+        currentHighestBid.ifPresent(this::refundBidder);
+
         member.deductMoney(request.getBidAmount());
         memberRepository.save(member);
 
@@ -63,7 +61,10 @@ public class BidService {
 
     @Transactional(readOnly = true)
     //특정 사용자의 입찰 내역 조회
-    public List<BidResponse> getUserBids(Long memberId) {
+    public List<BidResponse> getUserBids(Long memberId, CustomUserDetails userDetails) {
+        Member authenticatedMember = getAuthenticatedMember(userDetails);
+        validateBidHistoryAccess(memberId, authenticatedMember);
+
         return bidRepository.findByMemberId(memberId).stream()
                 .map(BidConverter::fromEntity)
                 .collect(Collectors.toList());
@@ -72,7 +73,7 @@ public class BidService {
     @Transactional(readOnly = true)
     //현재 최고 입찰가 조회
     public Integer getHighestBid(Long productId) {
-        List<Bid> topBids = bidRepository.findTopByProductIdWithLock(productId, PageRequest.of(0, 1));
+        List<Bid> topBids = bidRepository.findTopByProductId(productId, PageRequest.of(0, 1));
         return topBids.isEmpty() ? DEFAULT_HIGHEST_BID : topBids.get(0).getBidAmount();
     }
 
@@ -82,7 +83,13 @@ public class BidService {
         Member buyer = getAuthenticatedMember(userDetails);
         Product product = findProductByIdWithLock(request.getProductId());
         validateProductNotSold(product);
-        validateSufficientFunds(buyer, product.getBuyNowPrice());
+        validateNotSeller(product, buyer);
+        validateBuyNowPrice(product);
+
+        Optional<Bid> currentHighestBid = findHighestBidWithLock(product.getId());
+        validateSufficientFunds(buyer, product.getBuyNowPrice(), currentHighestBid);
+        currentHighestBid.ifPresent(this::refundBidder);
+
         buyer.deductMoney(product.getBuyNowPrice());
         memberRepository.save(buyer);
         Member seller = product.getMember();
@@ -119,17 +126,23 @@ public class BidService {
     }
 
     //잔액 확인
-    private void validateSufficientFunds(Member member, int amount) {
-        if (member.getMoney() < amount) {
+    private void validateSufficientFunds(Member member, int amount, Optional<Bid> currentHighestBid) {
+        int refundableAmount = currentHighestBid
+                .filter(bid -> Objects.equals(bid.getMember().getId(), member.getId()))
+                .map(Bid::getBidAmount)
+                .orElse(0);
+        if (member.getMoney() + refundableAmount < amount) {
             throw new InvalidBidException("잔액이 부족합니다.");
         }
     }
 
     //입찰 금액이 현재 최고 입찰가보다 높은지 확인
-    private void validateHigherBid(int bidAmount, Long productId) {
-        List<Bid> topBids = bidRepository.findTopByProductIdWithLock(productId, PageRequest.of(0, 1));
-        if (!topBids.isEmpty() && topBids.get(0).getBidAmount() >= bidAmount) {
+    private void validateHigherBid(int bidAmount, Product product, Optional<Bid> currentHighestBid) {
+        if (currentHighestBid.isPresent() && currentHighestBid.get().getBidAmount() >= bidAmount) {
             throw new InvalidBidException("입찰 금액은 현재 최고 입찰 금액보다 높아야 합니다.");
+        }
+        if (currentHighestBid.isEmpty() && product.getPrice() != null && bidAmount < product.getPrice()) {
+            throw new InvalidBidException("입찰 금액은 시작가 이상이어야 합니다.");
         }
     }
 
@@ -138,5 +151,37 @@ public class BidService {
         if (product.getEndTime() != null && product.getEndTime().isBefore(LocalDateTime.now())) {
             throw new InvalidBidException("입찰 가능 시간이 종료된 상품입니다.");
         }
+    }
+
+    private void validateBuyNowPrice(Product product) {
+        if (product.getBuyNowPrice() == null || product.getBuyNowPrice() <= 0) {
+            throw new InvalidBidException("즉시 구매가 설정되지 않은 상품입니다.");
+        }
+    }
+
+    private void validateNotSeller(Product product, Member member) {
+        if (Objects.equals(product.getMember().getId(), member.getId())) {
+            throw new InvalidBidException("판매자는 자신의 상품에 입찰하거나 구매할 수 없습니다.");
+        }
+    }
+
+    private void validateBidHistoryAccess(Long memberId, Member authenticatedMember) {
+        boolean isOwner = Objects.equals(memberId, authenticatedMember.getId());
+        boolean isAdmin = authenticatedMember.getRole() == Role.ROLE_ADMIN;
+        if (!isOwner && !isAdmin) {
+            throw new AuthenticationException("본인의 입찰 내역만 조회할 수 있습니다.");
+        }
+    }
+
+    private Optional<Bid> findHighestBidWithLock(Long productId) {
+        return bidRepository.findTopByProductIdWithLock(productId, PageRequest.of(0, 1))
+                .stream()
+                .findFirst();
+    }
+
+    private void refundBidder(Bid bid) {
+        Member previousBidder = bid.getMember();
+        previousBidder.addMoney(bid.getBidAmount());
+        memberRepository.save(previousBidder);
     }
 }

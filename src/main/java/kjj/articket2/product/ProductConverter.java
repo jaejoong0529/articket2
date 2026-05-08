@@ -26,11 +26,16 @@ public class ProductConverter {
                 .build();
     }
     public static ProductResponse fromEntity(Product product) {
+        return fromEntity(product, 0);
+    }
+
+    public static ProductResponse fromEntity(Product product, Integer highestBid) {
         return ProductResponse.builder()
                 .id(product.getId())
                 .productName(product.getProductName())
                 .price(product.getPrice())
                 .buyNowPrice(product.getBuyNowPrice())
+                .highestBid(highestBid)
                 .image(product.getImage()) // 이미지 URL 설정
                 .isSold(product.isSold())
                 .build();
